@@ -10,7 +10,10 @@ export interface SampleBill {
 
 export const user = { name: 'Purna', workspace: 'Personal workspace' };
 
+const todayISO = new Date().toISOString().slice(0, 10);
+
 export const bills: SampleBill[] = [
+  { id: '0', name: 'Internet', category: 'Utilities', amount: 42, dueDate: todayISO, method: 'Direct Debit', status: 'scheduled' },
   { id: '1', name: 'Rent', category: 'Rent', amount: 850, dueDate: '2026-11-01', method: 'Bank transfer', status: 'scheduled' },
   { id: '2', name: 'Electricity', category: 'Utilities', amount: 78, dueDate: '2026-11-03', method: 'Direct Debit', status: 'scheduled' },
   { id: '3', name: 'Phone', category: 'Subscriptions', amount: 25, dueDate: '2026-11-05', method: 'Card', status: 'scheduled' },
@@ -41,3 +44,22 @@ export const trend = {
   current: { label: 'October 2026', total: scheduledTotal, points: [20, 20, 22, 24, 30, 34, 34, 34, 36, 55, 90, 100] },
   previous: { label: 'September 2026', total: null as number | null, points: [] as number[] },
 };
+
+export const CATEGORY_COLORS: Record<string, string> = {
+  Rent: '#2f4a3c',
+  Utilities: '#5b8a6b',
+  Subscriptions: '#9ab89e',
+  'Credit card': '#c9a24b',
+  Other: '#b7bcae',
+};
+
+export const categoryBreakdown = Object.entries(
+  bills.reduce<Record<string, number>>((acc, b) => {
+    acc[b.category] = (acc[b.category] ?? 0) + b.amount;
+    return acc;
+  }, {}),
+).map(([category, amount]) => ({
+  category,
+  amount,
+  color: CATEGORY_COLORS[category] ?? CATEGORY_COLORS.Other,
+}));

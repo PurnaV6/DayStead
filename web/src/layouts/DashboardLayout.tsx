@@ -1,6 +1,7 @@
 import { LayoutGrid, FileText, Plus, CalendarDays, Plus as PlusIcon } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { user } from '../lib/sampleData';
+import PriorityAlertBanner from '../components/PriorityAlertBanner';
 
 const NAV = [
   { to: '/dashboard', label: 'Overview', icon: LayoutGrid, end: true },
@@ -13,8 +14,9 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex bg-[var(--ds-bg)]">
-      <aside className="w-72 shrink-0 border-r border-[var(--ds-line)] flex flex-col p-6">
+    <div className="min-h-screen md:flex bg-[var(--ds-bg)]">
+      {/* Desktop sidebar — hidden below md, where the bottom tab bar takes over */}
+      <aside className="hidden md:flex w-72 shrink-0 border-r border-[var(--ds-line)] flex-col p-6">
         <div>
           <div className="flex items-baseline gap-1">
             <span className="text-xl font-extrabold tracking-tight text-[var(--ds-accent)]">
@@ -75,17 +77,50 @@ export default function DashboardLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 p-10 overflow-y-auto">
+      {/* Mobile top bar — hidden at md and above */}
+      <header className="md:hidden flex items-center justify-between px-5 py-4 border-b border-[var(--ds-line)] bg-white sticky top-0 z-10">
+        <div className="flex items-baseline gap-1">
+          <span className="text-lg font-extrabold tracking-tight text-[var(--ds-accent)]">
+            daystead
+          </span>
+          <span className="text-[var(--ds-accent)]">•</span>
+        </div>
+        <div className="w-8 h-8 rounded-full bg-[var(--ds-accent)] text-white flex items-center justify-center text-xs font-semibold">
+          {user.name.slice(0, 2).toUpperCase()}
+        </div>
+      </header>
+
+      <main className="flex-1 p-5 md:p-10 pb-24 md:pb-10 overflow-y-auto">
+        <PriorityAlertBanner />
         <Outlet />
       </main>
+
+      {/* Mobile bottom tab bar — hidden at md and above, mirrors the native app's nav */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-[var(--ds-line)] flex justify-around py-2 z-10">
+        {NAV.map(({ to, label, icon: Icon, end }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              `flex flex-col items-center gap-1 px-2 py-1 text-[11px] font-medium ${
+                isActive ? 'text-[var(--ds-accent)]' : 'text-[var(--ds-muted)]'
+              }`
+            }
+          >
+            <Icon size={20} />
+            <span className="text-center leading-tight">{label.split(' ')[0]}</span>
+          </NavLink>
+        ))}
+      </nav>
     </div>
   );
 }
 
 export function AddNewButton() {
   return (
-    <button className="flex items-center gap-2 bg-[var(--ds-accent)] text-white font-semibold rounded-xl px-5 py-2.5 hover:opacity-90">
-      <PlusIcon size={16} /> Add new
+    <button className="flex items-center gap-2 bg-[var(--ds-accent)] text-white font-semibold rounded-xl px-4 md:px-5 py-2.5 hover:opacity-90 text-sm md:text-base">
+      <PlusIcon size={16} /> <span className="hidden sm:inline">Add new</span>
     </button>
   );
 }

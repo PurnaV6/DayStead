@@ -27,25 +27,25 @@ export default function OverviewPage() {
 
   return (
     <div>
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <p className="text-xs tracking-widest uppercase text-[var(--ds-muted)]">
             Your everyday, organised
           </p>
-          <h1 className="text-3xl font-extrabold mt-3">Good morning, {user.name} ☀️</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold mt-3">Good morning, {user.name} ☀️</h1>
           <p className="text-[var(--ds-muted)] mt-2">
             A clear view of your day. One less thing to remember.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-2 text-xs border border-[var(--ds-line)] rounded-full px-3 py-1.5 text-[var(--ds-muted)]">
+          <span className="hidden sm:flex items-center gap-2 text-xs border border-[var(--ds-line)] rounded-full px-3 py-1.5 text-[var(--ds-muted)]">
             <span className="w-2 h-2 rounded-full bg-[var(--ds-ink)]" /> Demo · Sample data
           </span>
           <AddNewButton />
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mt-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
         <StatCard
           label="Remaining bills this month"
           value={formatGBP(remainingTotal)}
@@ -79,20 +79,20 @@ export default function OverviewPage() {
       </div>
 
       <div className="bg-white border border-[var(--ds-line)] rounded-2xl p-6 mt-6">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-bold">Bill payment trends</h2>
             <p className="text-sm text-[var(--ds-muted)] mt-1">
               Cumulative monthly totals · compared on matching day numbers
             </p>
           </div>
-          <select className="border border-[var(--ds-line)] rounded-lg px-3 py-1.5 text-sm">
+          <select className="border border-[var(--ds-line)] rounded-lg px-3 py-1.5 text-sm self-start">
             <option>Scheduled bills</option>
             <option>Paid bills</option>
           </select>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
           <div>
             <p className="text-sm text-[var(--ds-muted)]">{trend.current.label}</p>
             <p className="text-2xl font-extrabold mt-1">{formatGBP(trend.current.total)}</p>
