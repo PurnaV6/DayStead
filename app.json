@@ -1,13 +1,25 @@
 {
   "expo": {
-    "name": "daystead",
+    "name": "DayStead",
     "slug": "daystead",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#1E6FD9"
+        }
+      ]
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSUserNotificationUsageDescription": "DayStead uses notifications to remind you about bills, medication and appointments."
+      }
     },
     "android": {
       "adaptiveIcon": {
