@@ -68,5 +68,7 @@ export interface UserBalance {
 export interface UserSettings {
   paydayDayOfMonth: number; // 1-31
   cashBuffer: number;
-  plan: 'free' | 'plus';
+  /** 'trial' = within or past the 30-day trial window; 'paid' = subscribed. See PRODUCT_SPEC.md §8. */
+  plan: 'trial' | 'paid';
+  trialStartedAt: string;
 }

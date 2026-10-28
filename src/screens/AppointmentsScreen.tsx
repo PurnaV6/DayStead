@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAppData } from '../context/AppDataContext';
-import { canAddAppointment, FREE_LIMITS } from '../lib/plan';
+import { hasFullAccess } from '../lib/plan';
 import { colors, spacing, typography } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
@@ -10,7 +10,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Appointments'>;
 
 export default function AppointmentsScreen({ navigation }: Props) {
   const { appointments, settings, deleteAppointment } = useAppData();
-  const canAdd = canAddAppointment(settings, appointments.length);
+  const canAdd = hasFullAccess(settings);
   const sorted = [...appointments].sort(
     (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime(),
   );
@@ -47,11 +47,11 @@ export default function AppointmentsScreen({ navigation }: Props) {
           canAdd
             ? navigation.navigate('AddAppointment')
             : navigation.navigate('Paywall', {
-                reason: `Free plan is limited to ${FREE_LIMITS.maxAppointments} appointments`,
+                reason: 'Your free trial has ended',
               })
         }
       >
-        <Text style={styles.addBtnText}>{canAdd ? '+ Add appointment' : 'Upgrade to add more'}</Text>
+        <Text style={styles.addBtnText}>{canAdd ? '+ Add appointment' : 'Subscribe to add more'}</Text>
       </Pressable>
     </View>
   );

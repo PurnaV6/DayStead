@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAppData } from '../context/AppDataContext';
 import { formatGBP } from '../lib/money';
-import { canAddBill, FREE_LIMITS } from '../lib/plan';
+import { hasFullAccess } from '../lib/plan';
 import { colors, spacing, typography } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 import type { Bill, PaymentStatus } from '../types';
@@ -21,7 +21,7 @@ export default function BillsScreen({ navigation }: Props) {
   const sorted = [...bills].sort(
     (a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime(),
   );
-  const canAdd = canAddBill(settings, bills.length);
+  const canAdd = hasFullAccess(settings);
 
   return (
     <View style={styles.container}>
@@ -69,10 +69,10 @@ export default function BillsScreen({ navigation }: Props) {
         onPress={() =>
           canAdd
             ? navigation.navigate('AddBill')
-            : navigation.navigate('Paywall', { reason: `Free plan is limited to ${FREE_LIMITS.maxBills} bills` })
+            : navigation.navigate('Paywall', { reason: 'Your free trial has ended' })
         }
       >
-        <Text style={styles.addBtnText}>{canAdd ? '+ Add bill' : 'Upgrade to add more bills'}</Text>
+        <Text style={styles.addBtnText}>{canAdd ? '+ Add bill' : 'Subscribe to keep adding bills'}</Text>
       </Pressable>
     </View>
   );

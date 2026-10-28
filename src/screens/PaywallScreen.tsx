@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAppData } from '../context/AppDataContext';
-import { PLUS_PRICE_MONTHLY_GBP, PLUS_PRICE_YEARLY_GBP } from '../lib/plan';
+import { PRICE_MONTHLY_GBP, PRICE_YEARLY_GBP } from '../lib/plan';
 import { colors, spacing, typography } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
@@ -18,35 +18,34 @@ export default function PaywallScreen({ route, navigation }: Props) {
   const { updateSettings } = useAppData();
   const reason = route.params?.reason;
 
-  async function upgrade() {
-    await updateSettings({ plan: 'plus' });
+  async function subscribe() {
+    await updateSettings({ plan: 'paid' });
     navigation.goBack();
   }
 
   return (
     <View style={styles.container}>
       {reason && <Text style={styles.reason}>{reason}</Text>}
-      <Text style={styles.title}>DayStead Plus</Text>
+      <Text style={styles.title}>Daystead</Text>
       <Text style={styles.subtitle}>
-        Unlimited bills, medications and appointments, payday-based planning, and spending
-        exports.
+        Your 30-day free trial has ended. Subscribe to keep your bills, medications and
+        appointments reminders running.
       </Text>
 
       <View style={styles.planCard}>
         <Text style={styles.planName}>Monthly</Text>
-        <Text style={styles.planPrice}>£{PLUS_PRICE_MONTHLY_GBP.toFixed(2)}/mo</Text>
+        <Text style={styles.planPrice}>£{PRICE_MONTHLY_GBP.toFixed(2)}/mo</Text>
       </View>
       <View style={[styles.planCard, styles.planCardHighlight]}>
         <Text style={styles.planName}>Annual</Text>
-        <Text style={styles.planPrice}>£{PLUS_PRICE_YEARLY_GBP.toFixed(2)}/yr</Text>
+        <Text style={styles.planPrice}>£{PRICE_YEARLY_GBP.toFixed(2)}/yr</Text>
         <Text style={styles.planSave}>
-          ~{Math.round((1 - PLUS_PRICE_YEARLY_GBP / (PLUS_PRICE_MONTHLY_GBP * 12)) * 100)}% off
-          monthly
+          ~{Math.round((1 - PRICE_YEARLY_GBP / (PRICE_MONTHLY_GBP * 12)) * 100)}% off monthly
         </Text>
       </View>
 
-      <Pressable style={styles.upgradeBtn} onPress={upgrade}>
-        <Text style={styles.upgradeBtnText}>Upgrade to Plus</Text>
+      <Pressable style={styles.upgradeBtn} onPress={subscribe}>
+        <Text style={styles.upgradeBtnText}>Subscribe</Text>
       </Pressable>
       <Pressable onPress={() => navigation.goBack()}>
         <Text style={styles.notNow}>Not now</Text>

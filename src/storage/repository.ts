@@ -118,16 +118,25 @@ export const balanceRepo = {
   },
 };
 
-const defaultSettings: UserSettings = {
+const BASE_DEFAULTS = {
   paydayDayOfMonth: 28,
   cashBuffer: 100,
-  plan: 'free',
+  plan: 'trial' as const,
 };
 
 export const settingsRepo = {
+  /**
+   * The trial must start on first-ever read and then stay fixed, not
+   * recompute on every call — so an unset trialStartedAt is persisted here
+   * immediately rather than left as a fresh `new Date()` default on every
+   * get() (which would never actually expire).
+   */
   get: async (): Promise<UserSettings> => {
     const raw = await AsyncStorage.getItem(KEYS.settings);
-    return raw ? { ...defaultSettings, ...JSON.parse(raw) } : defaultSettings;
+    if (raw) return { ...BASE_DEFAULTS, trialStartedAt: new Date().toISOString(), ...JSON.parse(raw) };
+    const fresh: UserSettings = { ...BASE_DEFAULTS, trialStartedAt: new Date().toISOString() };
+    await AsyncStorage.setItem(KEYS.settings, JSON.stringify(fresh));
+    return fresh;
   },
   set: async (settings: UserSettings) => {
     await AsyncStorage.setItem(KEYS.settings, JSON.stringify(settings));

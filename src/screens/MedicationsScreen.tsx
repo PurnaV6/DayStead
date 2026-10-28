@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAppData } from '../context/AppDataContext';
-import { canAddMedication, FREE_LIMITS } from '../lib/plan';
+import { hasFullAccess } from '../lib/plan';
 import { colors, spacing, typography } from '../theme';
 import type { RootStackParamList } from '../navigation/types';
 
@@ -10,7 +10,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Medications'>;
 
 export default function MedicationsScreen({ navigation }: Props) {
   const { medications, settings, deleteMedication, logDoseTaken } = useAppData();
-  const canAdd = canAddMedication(settings, medications.length);
+  const canAdd = hasFullAccess(settings);
   const todayKey = new Date().toISOString().slice(0, 10);
 
   return (
@@ -49,12 +49,12 @@ export default function MedicationsScreen({ navigation }: Props) {
           canAdd
             ? navigation.navigate('AddMedication')
             : navigation.navigate('Paywall', {
-                reason: `Free plan is limited to ${FREE_LIMITS.maxMedications} medications`,
+                reason: 'Your free trial has ended',
               })
         }
       >
         <Text style={styles.addBtnText}>
-          {canAdd ? '+ Add medication' : 'Upgrade to add more medications'}
+          {canAdd ? '+ Add medication' : 'Subscribe to keep adding medications'}
         </Text>
       </Pressable>
     </View>

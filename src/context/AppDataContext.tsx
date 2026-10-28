@@ -70,7 +70,8 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettingsState] = useState<UserSettings>({
     paydayDayOfMonth: 28,
     cashBuffer: 100,
-    plan: 'free',
+    plan: 'trial',
+    trialStartedAt: new Date().toISOString(),
   });
 
   const refresh = useCallback(async () => {

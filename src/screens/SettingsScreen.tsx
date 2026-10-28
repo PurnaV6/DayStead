@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useAppData } from '../context/AppDataContext';
 import { formatGBP } from '../lib/money';
+import { trialDaysRemaining } from '../lib/plan';
 import { colors, spacing, typography } from '../theme';
 
 export default function SettingsScreen() {
@@ -55,7 +56,13 @@ export default function SettingsScreen() {
       <Text style={styles.sectionTitle}>Plan</Text>
       <View style={styles.planRow}>
         <Text style={styles.body}>Current plan</Text>
-        <Text style={styles.planBadge}>{settings.plan === 'plus' ? 'DayStead Plus' : 'Free'}</Text>
+        <Text style={styles.planBadge}>
+          {settings.plan === 'paid'
+            ? 'Subscribed'
+            : `Trial — ${trialDaysRemaining(settings.trialStartedAt)} day${
+                trialDaysRemaining(settings.trialStartedAt) === 1 ? '' : 's'
+              } left`}
+        </Text>
       </View>
     </ScrollView>
   );
