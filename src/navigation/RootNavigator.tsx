@@ -2,7 +2,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
+import PriorityAlertBanner from '../components/PriorityAlertBanner';
 import HomeScreen from '../screens/HomeScreen';
 import BillsScreen from '../screens/BillsScreen';
 import AddBillScreen from '../screens/AddBillScreen';
@@ -36,20 +37,23 @@ const TAB_ICON: Record<string, string> = {
 
 function Tabs() {
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarActiveTintColor: colors.accent,
-        tabBarInactiveTintColor: colors.muted,
-        tabBarIcon: () => <Text style={{ fontSize: 18 }}>{TAB_ICON[route.name]}</Text>,
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Bills" component={BillsScreen as any} />
-      <Tab.Screen name="Medications" component={MedicationsScreen as any} />
-      <Tab.Screen name="Expenses" component={ExpensesScreen as any} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-    </Tab.Navigator>
+    <View style={{ flex: 1 }}>
+      <PriorityAlertBanner />
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarActiveTintColor: colors.accent,
+          tabBarInactiveTintColor: colors.muted,
+          tabBarIcon: () => <Text style={{ fontSize: 18 }}>{TAB_ICON[route.name]}</Text>,
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Bills" component={BillsScreen as any} />
+        <Tab.Screen name="Medications" component={MedicationsScreen as any} />
+        <Tab.Screen name="Expenses" component={ExpensesScreen as any} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
+    </View>
   );
 }
 
