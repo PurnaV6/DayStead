@@ -2,7 +2,8 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import PriorityAlertBanner from '../components/PriorityAlertBanner';
 import HomeScreen from '../screens/HomeScreen';
 import BillsScreen from '../screens/BillsScreen';
@@ -27,12 +28,12 @@ import type { RootStackParamList } from './types';
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const TAB_ICON: Record<string, string> = {
-  Home: '🏠',
-  Bills: '💷',
-  Medications: '💊',
-  Expenses: '📊',
-  Settings: '⚙️',
+const TAB_ICON: Record<string, React.ComponentProps<typeof Feather>['name']> = {
+  Home: 'home',
+  Bills: 'file-text',
+  Medications: 'plus-circle',
+  Expenses: 'bar-chart-2',
+  Settings: 'settings',
 };
 
 function Tabs() {
@@ -44,7 +45,7 @@ function Tabs() {
           headerShown: false,
           tabBarActiveTintColor: colors.accent,
           tabBarInactiveTintColor: colors.muted,
-          tabBarIcon: () => <Text style={{ fontSize: 18 }}>{TAB_ICON[route.name]}</Text>,
+          tabBarIcon: ({ color }) => <Feather name={TAB_ICON[route.name]} size={20} color={color} />,
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
