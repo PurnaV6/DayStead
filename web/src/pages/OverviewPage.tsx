@@ -134,7 +134,7 @@ export default function OverviewPage() {
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip formatter={(v: number) => formatGBP(v)} />
+              <Tooltip formatter={(value) => typeof value === 'number' && Number.isFinite(value) ? formatGBP(value) : 'No data'} />
               <Line
                 type="monotone"
                 dataKey="october"
