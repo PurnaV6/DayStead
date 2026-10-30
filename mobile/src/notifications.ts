@@ -22,7 +22,7 @@ async function scheduleTrialWarning(){
  const at=trial.endsAt-TRIAL_NOTICE_DAYS*86400000;
  if(at<=Date.now()+60000||!(await Notifications.getPermissionsAsync()).granted)return;
  const day=new Date(trial.endsAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
- await Notifications.scheduleNotificationAsync({identifier:TRIAL_ID,content:{title:'Your free month ends soon',body:`Your Daystead trial ends on ${day}. You'll be charged ${trial.price} then unless you cancel before it ends.`,sound:'default'},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:new Date(at),channelId:'daystead'}});
+ await Notifications.scheduleNotificationAsync({identifier:TRIAL_ID,content:{title:'Your free month ends soon',body:`Your Daystead trial ends on ${day}. You'll be charged ${trial.price} then unless you cancel before it ends. If you've already cancelled, you won't be charged.`,sound:'default'},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:new Date(at),channelId:'daystead'}});
 }
 // Pass null when there is no trial that will turn into a charge (not trialling, or already cancelled).
 export function setTrialWarning(next:{endsAt:Date;price:string}|null){

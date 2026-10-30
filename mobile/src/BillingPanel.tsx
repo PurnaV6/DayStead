@@ -1,7 +1,7 @@
 import React,{useEffect,useState} from 'react';
 import {AppState,Linking,Pressable,Text,View} from 'react-native';
 import type {CustomerInfo,PurchasesPackage} from 'react-native-purchases';
-import {billingConfigured,connectBilling,freeTrialLabel,getBillingInfo,hasPremium,premiumId,purchasePlan,restorePurchases,watchBilling} from './billing';
+import {billingConfigured,connectBilling,freeTrialLabel,priceForEntitlement,getBillingInfo,hasPremium,premiumId,purchasePlan,restorePurchases,watchBilling} from './billing';
 import {setTrialWarning} from './notifications';
 export function useBilling(userId?:string){
  const [state,setState]=useState<{userId?:string;info:CustomerInfo|null;plans:PurchasesPackage[];error:string;loading:boolean}>({info:null,plans:[],error:'',loading:false});
@@ -21,7 +21,7 @@ export function useBilling(userId?:string){
  // Warn 3 days before a free trial turns into a charge. Cleared when not trialling, already cancelled, or signed out.
  const trialing=info?.entitlements.active[premiumId];
  const trialEnd=trialing?.periodType==='TRIAL'&&trialing.willRenew&&trialing.expirationDate?trialing.expirationDate:null;
- const trialPrice=plans.find(p=>p.product.identifier===trialing?.productIdentifier)?.product.priceString||'the subscription price';
+ const trialPrice=priceForEntitlement(plans,trialing?.productIdentifier)||'the subscription price';
  useEffect(()=>{void setTrialWarning(trialEnd?{endsAt:new Date(trialEnd),price:trialPrice}:null).catch(()=>{})},[trialEnd,trialPrice]);
  return {info,plans,error:matching?state.error:'',loading:billingConfigured&&!!userId&&!matching,setInfo:(next:CustomerInfo)=>setState(previous=>({...previous,userId,info:next})),active:hasPremium(info)};
 }
@@ -29,12 +29,15 @@ export function BillingPanel({billing}: {billing:ReturnType<typeof useBilling>})
  const [selected,setSelected]=useState('ANNUAL'),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
  const plan=billing.plans.find(p=>p.packageType===selected);
  const entitlement=billing.info?.entitlements.all[premiumId];
+ // Stores give intro trials to first-time subscribers only, so anyone with any past
+ // entitlement is not offered one (the store would charge them immediately).
+ const subscribedBefore=!!entitlement;
  // Preview builds have no store products, so show the planned offer.
- const trialFor=(p:PurchasesPackage|{packageType:string})=>billingConfigured?freeTrialLabel(p as PurchasesPackage):'1 month free';
- const selectedTrial=plan?trialFor(plan):billingConfigured?null:'1 month free';
+ const trialFor=(p:PurchasesPackage|{packageType:string})=>subscribedBefore?null:billingConfigured?freeTrialLabel(p as PurchasesPackage):'1 month free';
+ const selectedTrial=plan?trialFor(plan):billingConfigured||subscribedBefore?null:'1 month free';
  const inTrial=billing.active&&entitlement?.periodType==='TRIAL'&&!!entitlement.expirationDate;
  const trialEndDay=inTrial?new Date(entitlement!.expirationDate!).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
- const trialPrice=billing.plans.find(p=>p.product.identifier===entitlement?.productIdentifier)?.product.priceString;
+ const trialPrice=priceForEntitlement(billing.plans,entitlement?.productIdentifier);
  const run=async(restore=false)=>{setBusy(true);setMessage('');try{const info=restore?await restorePurchases():(await purchasePlan(plan!)).customerInfo;billing.setInfo(info);setMessage(hasPremium(info)?'Premium access is active.':'No active subscription was found. If a purchase is pending, access will update after the store confirms it.')}catch(e){if(!(e as {userCancelled?:boolean}).userCancelled)setMessage(e instanceof Error?e.message:'The store could not complete this request.')}finally{setBusy(false)}};
  const button=(label:string,action:()=>void,disabled=false)=><Pressable accessibilityRole="button" disabled={disabled} onPress={action} style={{padding:16,borderRadius:14,backgroundColor:disabled?'#DCE2D9':'#2D6554',alignItems:'center'}}><Text style={{color:disabled?'#56635B':'white',fontWeight:'600'}}>{label}</Text></Pressable>;
  return <View style={{backgroundColor:'white',padding:20,borderRadius:22,gap:16}}>
@@ -49,7 +52,7 @@ export function BillingPanel({billing}: {billing:ReturnType<typeof useBilling>})
   {button('Restore purchases',()=>void run(true),!billingConfigured||busy||billing.loading)}
   {button('Manage or cancel subscription',()=>{const url=billing.info?.managementURL;if(url)void Linking.openURL(url).catch(()=>setMessage('Unable to open your store. Manage subscriptions in your Apple or Google account settings.'))},!billing.info?.managementURL||busy)}
   <Text style={{fontSize:12,lineHeight:19,color:'#617168'}}>Subscriptions renew automatically unless cancelled through your store. Payment and any eligible introductory offer are confirmed in the store purchase sheet. Cancellation normally retains access until the paid period ends. Deleting your Daystead account does not cancel store billing.</Text>
-  {!!selectedTrial&&!billing.active&&<Text style={{fontSize:12,lineHeight:19,color:'#617168'}}>New subscribers get the first month free. Cancel any time before the trial ends and you won’t be charged. Your store confirms whether you’re eligible before you subscribe.</Text>}
+  {!!selectedTrial&&!billing.active&&<Text style={{fontSize:12,lineHeight:19,color:'#617168'}}>New subscribers get {selectedTrial}. Cancel any time before the trial ends and you won’t be charged. Your store confirms whether you’re eligible before you subscribe.</Text>}
   {!billingConfigured&&<Text style={{fontSize:12}}>Proposed UK prices in GBP. Live billing displays the price, currency and trial supplied by your store.</Text>}
   {!!(message||billing.error)&&<Text accessibilityLiveRegion="polite">{message||billing.error}</Text>}
  </View>;
