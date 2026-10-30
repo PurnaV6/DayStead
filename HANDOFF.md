@@ -4,6 +4,8 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 
 **What it is.** Daystead by Provifi ("Your day, in order.") is a UK subscription app that puts bill reminders with "money needed before payday", medication reminders (including alarm-style alerts) and appointments/to-dos in one place. Owner: Purna Vemula.
 
+**Price (decided).** £3.99/month or £35.99/year. You keep about £2.83/month or £25.49/year per subscriber after VAT and the 15% store fee. Running costs are about £53/month once launched, so break-even is about 22 paying subscribers. Paid ads lose money at this price (about £75 to £370 per paying user against a lifetime value of about £34), so growth must come from partnerships, communities and App Store search.
+
 **Where everything is**
 - Repo: https://github.com/PurnaV6/DayStead. Work on a branch and open a pull request; do not push to `main`.
 - `mobile/` is the real app (Expo + Supabase). It is what ships. Tested by Purna in Expo Go (development mode, not a store build).
@@ -22,7 +24,7 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 - Backend: deletion, owner metrics and webhook functions deployed; subscription sync SQL applied.
 
 **Open decisions for Purna**
-1. **Price.** App and website show £3.99/month or £35.99/year; `PRODUCT_SPEC.md` and `LAUNCH.md` say £4.99/£49.99. Pick one and update all four places.
+1. **Free tier?** Research suggests keeping basic medication reminders free and charging for money planning and carer features; the spec is currently trial-only.
 2. **Delete the legacy root app** so nobody runs or ships the wrong one.
 
 **Known gaps (highest first)**

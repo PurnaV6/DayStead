@@ -88,8 +88,8 @@ not the mobile MVP.
 | Plan | Price |
 |---|---|
 | Full-feature trial | 30 days free |
-| Monthly | £4.99 |
-| Annual | £49.99 |
+| Monthly | £3.99 |
+| Annual | £35.99 |
 
 **No permanent unlimited free tier.** The whole app is paid after the trial.
 `src/lib/plan.ts` currently implements the OLD model (free tier capped at 5
