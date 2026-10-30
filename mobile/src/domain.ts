@@ -1,5 +1,5 @@
 export type Kind = 'bill' | 'medicine' | 'appointment' | 'todo';
-export type Schedule = { id:string; user_id:string; kind:Kind; title:string; category:string; amount_pence:number|null; due_at:string; repeat_rule:'none'|'daily'|'weekly'|'monthly'; end_at:string|null; notes:string; version:number; reminder_mode?:'gentle'|'alarm'; priority?:boolean; dose_minutes?:number[]|null };
+export type Schedule = { id:string; user_id:string; kind:Kind; title:string; category:string; amount_pence:number|null; due_at:string; repeat_rule:'none'|'daily'|'weekly'|'monthly'; end_at:string|null; notes:string; version:number; reminder_mode?:'gentle'|'alarm'; priority?:boolean; dose_minutes?:number[]|null; for_person?:string|null };
 export type Completion = {schedule_id:string; occurrence_at:string; status:string};
 export type Occurrence = {schedule:Schedule; at:Date; key:string; status?:string};
 export const pounds=(pence:number)=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(pence/100);
