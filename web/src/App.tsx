@@ -5,6 +5,7 @@ import OverviewPage from './pages/OverviewPage';
 import AccountServicePage from './pages/AccountServicePage';
 import InfoPage from './pages/InfoPage';
 import PlaceholderPage from './pages/PlaceholderPage';
+import VerifiedPage from './pages/VerifiedPage';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
       <Routes>
         <Route path="/delete-account" element={<AccountServicePage/>}/>
         <Route path="/owner" element={<AccountServicePage owner/>}/>
+        <Route path="/verified" element={<VerifiedPage />} />
         {(['pricing','privacy','terms','support'] as const).map(page=><Route key={page} path={'/'+page} element={<InfoPage page={page}/>}/>)}
         <Route path="/" element={<SignInPage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
