@@ -1,0 +1,10 @@
+{
+  "storeProductsAndPricesVerified": false,
+  "sandboxPurchaseRestoreRefundTestsPassed": false,
+  "subscriptionBackendAndGracePeriodVerified": false,
+  "backgroundRemindersAndMultiDeviceTestsPassed": false,
+  "authEmailAndDeletionDeviceTestsPassed": false,
+  "privacyTermsSupportAndRetentionReviewed": false,
+  "storePrivacyAndHealthDeclarationsCompleted": false,
+  "iconsScreenshotsAndAccessibilityReviewed": false
+}

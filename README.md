@@ -1,3 +1,11 @@
+# Daystead release workspace
+
+Use **`mobile/`** for the Supabase-backed iOS/Android app tested by Purna. Use **`web/`** for the Vite website. The root Expo files below are a legacy local-storage prototype and must not be submitted to the stores.
+
+Read [release/LAUNCH.md](release/LAUNCH.md) for completed work, deployment setup and remaining launch blockers. Production release checks intentionally fail until the checklist and provider setup are complete.
+
+---
+
 # DayStead — by Provifi
 
 A daily life-admin tracker: bills, medication reminders, appointments and simple expense
