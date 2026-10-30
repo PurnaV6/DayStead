@@ -35,7 +35,7 @@ export default function HomeScreen({ navigation }: any) {
   });
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-  const firstName = 'there'; // no account/name capture yet — see PRODUCT_SPEC.md §2
+  const firstName = 'there'; // no account/name capture yet, see PRODUCT_SPEC.md §2
 
   return (
     <ScrollView

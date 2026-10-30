@@ -57,7 +57,7 @@ export function getPriorityAlerts(
         id: `med-${med.id}-${dose.time}`,
         kind: 'medication_due_soon',
         title: mins <= 0 ? `Take ${med.name} now` : `Take ${med.name} in ${Math.ceil(mins)} min`,
-        detail: `${med.dosage} — scheduled for ${dose.time}`,
+        detail: `${med.dosage}, scheduled for ${dose.time}`,
       });
     }
   }

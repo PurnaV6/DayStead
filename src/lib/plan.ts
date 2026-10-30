@@ -4,7 +4,7 @@ import type { UserSettings } from '../types';
  * Pricing model per PRODUCT_SPEC.md §8 (supersedes the earlier free-tier +
  * £2.99/£29.99 model that used to live here). There is no permanent free
  * tier: every user gets a 30-day full-feature trial, then the whole app is
- * paid. Feature caps (FREE_LIMITS) no longer apply — kept only as the
+ * paid. Feature caps (FREE_LIMITS) no longer apply, kept only as the
  * trial-expired gate, not a free/paid feature split.
  */
 export const TRIAL_DAYS = 30;

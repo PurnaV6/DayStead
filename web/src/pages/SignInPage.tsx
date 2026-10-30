@@ -78,7 +78,7 @@ export default function SignInPage() {
             disabled
             className="w-full bg-[var(--ds-accent)] text-white font-semibold rounded-xl py-3 opacity-80 cursor-not-allowed"
           >
-            Sign in — setup pending
+            Sign in (setup pending)
           </button>
 
           <div className="flex justify-between mt-4 text-sm">

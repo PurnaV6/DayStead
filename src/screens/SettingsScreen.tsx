@@ -34,7 +34,7 @@ export default function SettingsScreen() {
 
       <Text style={styles.sectionTitle}>Your balance</Text>
       <Text style={styles.helper}>
-        Entered manually — not synced to your bank. Last updated:{' '}
+        Entered manually, not synced to your bank. Last updated:{' '}
         {balance ? new Date(balance.updatedAt).toLocaleString('en-GB') : 'never'}
       </Text>
       <TextInput
@@ -59,7 +59,7 @@ export default function SettingsScreen() {
         <Text style={styles.planBadge}>
           {settings.plan === 'paid'
             ? 'Subscribed'
-            : `Trial — ${trialDaysRemaining(settings.trialStartedAt)} day${
+            : `Trial: ${trialDaysRemaining(settings.trialStartedAt)} day${
                 trialDaysRemaining(settings.trialStartedAt) === 1 ? '' : 's'
               } left`}
         </Text>

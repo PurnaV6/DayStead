@@ -127,7 +127,7 @@ const BASE_DEFAULTS = {
 export const settingsRepo = {
   /**
    * The trial must start on first-ever read and then stay fixed, not
-   * recompute on every call — so an unset trialStartedAt is persisted here
+   * recompute on every call, so an unset trialStartedAt is persisted here
    * immediately rather than left as a fresh `new Date()` default on every
    * get() (which would never actually expire).
    */

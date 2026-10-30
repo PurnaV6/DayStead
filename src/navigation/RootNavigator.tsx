@@ -23,7 +23,7 @@ import type { RootStackParamList } from './types';
 // React Navigation let a screen `navigate()` into an ancestor navigator's
 // routes at runtime even though each navigator's own TS prop types only
 // cover its own screens. Babel (Expo's bundler) doesn't type-check, so this
-// doesn't block running the app — tightening it to CompositeScreenProps is
+// doesn't block running the app, tightening it to CompositeScreenProps is
 // a follow-up, not a blocker for the MVP.
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();

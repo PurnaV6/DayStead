@@ -1,5 +1,5 @@
 /**
- * Plays a beeping alarm tone for ~5 seconds using the Web Audio API — no
+ * Plays a beeping alarm tone for ~5 seconds using the Web Audio API, no
  * audio asset needed. Browsers block audio until a user gesture has
  * happened on the page at least once; if that hasn't occurred yet, this
  * silently no-ops rather than throwing.
@@ -31,6 +31,6 @@ export function playAlarm(durationMs = 5000): void {
 
     setTimeout(() => ctx.close(), durationMs + 200);
   } catch {
-    // Audio not available in this context — the visual banner still shows.
+    // Audio not available in this context, the visual banner still shows.
   }
 }

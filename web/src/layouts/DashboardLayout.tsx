@@ -15,7 +15,7 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen md:flex bg-[var(--ds-bg)]">
-      {/* Desktop sidebar — hidden below md, where the bottom tab bar takes over */}
+      {/* Desktop sidebar, hidden below md, where the bottom tab bar takes over */}
       <aside className="hidden md:flex w-72 shrink-0 border-r border-[var(--ds-line)] flex-col p-6">
         <div>
           <div className="flex items-baseline gap-1">
@@ -77,7 +77,7 @@ export default function DashboardLayout() {
         </div>
       </aside>
 
-      {/* Mobile top bar — hidden at md and above */}
+      {/* Mobile top bar, hidden at md and above */}
       <header className="md:hidden flex items-center justify-between px-5 py-4 border-b border-[var(--ds-line)] bg-white sticky top-0 z-10">
         <div className="flex items-baseline gap-1">
           <span className="text-lg font-extrabold tracking-tight text-[var(--ds-accent)]">
@@ -95,7 +95,7 @@ export default function DashboardLayout() {
         <Outlet />
       </main>
 
-      {/* Mobile bottom tab bar — hidden at md and above, mirrors the native app's nav */}
+      {/* Mobile bottom tab bar, hidden at md and above, mirrors the native app's nav */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-[var(--ds-line)] flex justify-around py-2 z-10">
         {NAV.map(({ to, label, icon: Icon, end }) => (
           <NavLink

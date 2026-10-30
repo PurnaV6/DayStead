@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 /**
- * Not wired into any screen yet — the MVP runs entirely on local
+ * Not wired into any screen yet, the MVP runs entirely on local
  * AsyncStorage (see src/storage/repository.ts). This client is here so that
  * moving to a real backend later is a swap of the repository layer's
  * internals, not a rewrite of the app. Set these two env vars (via

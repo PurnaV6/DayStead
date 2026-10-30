@@ -9,7 +9,7 @@ import type { RootStackParamList } from '../navigation/types';
 type Props = NativeStackScreenProps<RootStackParamList, 'Paywall'>;
 
 /**
- * Billing is not wired up yet — this screen is the UI and the plan-gating
+ * Billing is not wired up yet, this screen is the UI and the plan-gating
  * logic (src/lib/plan.ts) that RevenueCat's purchase callbacks will call
  * into once store products exist. Today, "Upgrade" just flips a local flag
  * so the free/paid gating can be tested end to end.

@@ -146,7 +146,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
           const [hour, minute] = dose.time.split(':').map(Number);
           await scheduleDailyRepeating(
             `Time to take ${med.name}`,
-            `${med.dosage} — scheduled for ${dose.time}`,
+            `${med.dosage}, scheduled for ${dose.time}`,
             hour,
             minute,
           );
