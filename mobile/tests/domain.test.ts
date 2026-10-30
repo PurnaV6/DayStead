@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {occurrences,monthBills,plannedAlerts,todayMedicines} from '../src/domain.ts';
+import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates} from '../src/domain.ts';
 import type {Schedule} from '../src/domain.ts';
 const base:Schedule={id:'bill1',user_id:'u1',kind:'bill',title:'Rent',category:'Rent',amount_pence:95000,due_at:new Date(2026,0,31,9).toISOString(),repeat_rule:'monthly',end_at:null,notes:'',version:1};
 test('month end recurrence clamps February and returns to March 31',()=>{
@@ -60,4 +60,20 @@ test('legacy medicine records retain their exact single occurrence timestamp',()
  const med={...base,kind:'medicine' as const,repeat_rule:'daily' as const,due_at:new Date(2026,9,29,8,12,34).toISOString(),dose_minutes:null};
  const items=occurrences([med],new Date(2026,9,29),new Date(2026,9,29,23,59));
  assert.equal(items.length,1);assert.equal(items[0].at.toISOString(),med.due_at);
+});
+
+
+test('native alarms include only explicitly selected uncompleted medication occurrences',()=>{
+ const med={...base,kind:'medicine' as const,reminder_mode:'alarm' as const,repeat_rule:'daily' as const,dose_minutes:[480,840]};
+ const items=occurrences([med],new Date(2026,1,1),new Date(2026,1,3));
+ const candidates=nativeAlarmCandidates([...items,{...items[0],schedule:{...med,reminder_mode:'gentle'}},{...items[0],schedule:base}],2);
+ assert.equal(candidates.length,2);assert.ok(candidates[0].at<=candidates[1].at);
+ assert.equal(nativeAlarmCandidates(items.map(o=>({...o,status:'taken'}))).length,0);
+ assert.equal(nativeAlarmCandidates(items).length,items.length);
+});
+test('to-do recurrence and completion use the same occurrence identity as appointments',()=>{
+ const todo={...base,kind:'todo' as const,repeat_rule:'weekly' as const};
+ const items=occurrences([todo],new Date(2026,0,31),new Date(2026,1,15));
+ const completed=occurrences([todo],new Date(2026,0,31),new Date(2026,1,15),[{schedule_id:todo.id,occurrence_at:items[0].at.toISOString(),status:'completed'}]);
+ assert.equal(completed[0].status,'completed');assert.equal(completed[1].status,undefined);
 });

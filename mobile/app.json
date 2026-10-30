@@ -9,7 +9,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.provifi.daystead",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSAlarmKitUsageDescription": "Daystead sounds alarms for medicine schedules you explicitly set to Alarm mode."
+      }
     },
     "android": {
       "adaptiveIcon": {

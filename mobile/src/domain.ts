@@ -1,5 +1,5 @@
-export type Kind = 'bill' | 'medicine' | 'appointment';
-export type Schedule = { id:string; user_id:string; kind:Kind; title:string; category:string; amount_pence:number|null; due_at:string; repeat_rule:'none'|'daily'|'weekly'|'monthly'; end_at:string|null; notes:string; version:number; dose_minutes?:number[]|null };
+export type Kind = 'bill' | 'medicine' | 'appointment' | 'todo';
+export type Schedule = { id:string; user_id:string; kind:Kind; title:string; category:string; amount_pence:number|null; due_at:string; repeat_rule:'none'|'daily'|'weekly'|'monthly'; end_at:string|null; notes:string; version:number; reminder_mode?:'gentle'|'alarm'; priority?:boolean; dose_minutes?:number[]|null };
 export type Completion = {schedule_id:string; occurrence_at:string; status:string};
 export type Occurrence = {schedule:Schedule; at:Date; key:string; status?:string};
 export const pounds=(pence:number)=>new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'}).format(pence/100);
@@ -51,4 +51,10 @@ export function todayMedicines(items:Occurrence[], now:Date){
 }
 export function formatDoseTime(minutes:number){
  const hour=Math.floor(minutes/60);return `${hour%12||12}:${String(minutes%60).padStart(2,'0')} ${hour<12?'AM':'PM'}`;
+}
+
+// Keep completion and sound control separate. A stopped alarm never enters this filter
+// as 'taken'; only a recorded completion removes its occurrence.
+export function nativeAlarmCandidates(items:Occurrence[], limit=48){
+ return items.filter(o=>!o.status&&o.schedule.kind==='medicine'&&o.schedule.reminder_mode==='alarm').sort((a,b)=>+a.at-+b.at).slice(0,limit);
 }
