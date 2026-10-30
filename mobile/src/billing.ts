@@ -22,9 +22,17 @@ export function priceForEntitlement(plans:PurchasesPackage[],productIdentifier?:
 }
 // The free trial is a store introductory offer, so its length comes from the store product,
 // never from app code. Eligibility (first-time subscribers only) is confirmed by the store sheet.
-export function freeTrialLabel(plan:PurchasesPackage):string|null{
+// iOS only: Apple tracks trial use per Apple ID across the subscription group, which the
+// app can't see. RevenueCat's guidance: show the trial only for a definite ELIGIBLE answer.
+// Android needs no call: Google Play only returns free-trial offers to eligible users.
+export async function iosTrialEligibility(plans:PurchasesPackage[]):Promise<Record<string,boolean>>{
+ if(Platform.OS!=='ios'||!plans.length)return {};
+ const result=await Purchases.checkTrialOrIntroductoryPriceEligibility(plans.map(p=>p.product.identifier));
+ return Object.fromEntries(Object.entries(result).map(([id,e])=>[id,e.status===Purchases.INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE]));
+}
+export function freeTrialLabel(plan:PurchasesPackage,iosEligible?:boolean):string|null{
  const intro=plan.product.introPrice;
- if(intro&&intro.price===0&&intro.periodNumberOfUnits>0&&KNOWN_UNITS.includes(intro.periodUnit))return unitName(intro.periodUnit,intro.periodNumberOfUnits*Math.max(1,intro.cycles))+' free';
+ if(intro&&intro.price===0&&iosEligible===true&&intro.periodNumberOfUnits>0&&KNOWN_UNITS.includes(intro.periodUnit))return unitName(intro.periodUnit,intro.periodNumberOfUnits*Math.max(1,intro.cycles))+' free';
  const free=plan.product.defaultOption?.freePhase?.billingPeriod;
  if(free&&free.value>0&&KNOWN_UNITS.includes(free.unit))return unitName(free.unit,free.value)+' free';
  return null;
