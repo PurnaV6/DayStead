@@ -2,7 +2,7 @@
 
 ## Canonical source
 
-`mobile/` is the Supabase-backed application Purna tested on iPhone, including custom medicine times and safe-area fixes. `web/` is the existing Vite demonstration website. The root-level Expo application is a different legacy local-storage prototype and MUST NOT be submitted to stores. EAS builds must run from `mobile/`.
+`mobile/` is the Supabase-backed application Purna tested on iPhone, including custom medicine times and safe-area fixes. `web/` is the existing Vite demonstration website. EAS builds must run from `mobile/`.
 
 ## Implemented in this branch
 
