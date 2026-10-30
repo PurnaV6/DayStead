@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {subscriptionState} from '../../supabase/functions/_shared/subscription.ts';
+const now=Date.parse('2026-10-29T12:00:00Z');
+const subscriber={entitlements:{premium:{product_identifier:'monthly',expires_date:'2026-11-29T12:00:00Z'}},subscriptions:{monthly:{period_type:'normal',is_sandbox:false}}};
+test('active store subscription grants access',()=>assert.equal(subscriptionState(subscriber,now).status,'active'));
+test('missing and sandbox subscriptions do not grant production access',()=>{assert.equal(subscriptionState({},now).status,'expired');assert.equal(subscriptionState({...subscriber,subscriptions:{monthly:{is_sandbox:true}}},now).status,'expired')});
+test('expired subscription with no store grace expires',()=>assert.equal(subscriptionState(subscriber,Date.parse('2026-12-01')).status,'expired'));
+test('store grace retains access through the confirmed date',()=>{const s={...subscriber,entitlements:{premium:{product_identifier:'monthly',expires_date:'2026-10-28T12:00:00Z'}},subscriptions:{monthly:{grace_period_expires_date:'2026-11-04T12:00:00Z'}}};const state=subscriptionState(s,now);assert.equal(state.status,'grace');assert.equal(state.access_until,'2026-11-04T12:00:00.000Z');assert.equal(subscriptionState(s,Date.parse('2026-11-05')).status,'expired')});
+test('no expiration cannot accidentally grant lifetime access',()=>assert.equal(subscriptionState({...subscriber,entitlements:{premium:{product_identifier:'monthly',expires_date:null}}},now).status,'expired'));
