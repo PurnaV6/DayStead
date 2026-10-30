@@ -1,14 +1,10 @@
-import { bills, medications } from './sampleData';
+import { formatGBP, getData, ymd } from './store';
 
 export interface PriorityAlert {
   id: string;
   kind: 'bill_due_today' | 'medication_due_soon';
   title: string;
   detail: string;
-}
-
-function isSameDay(a: Date, b: Date): boolean {
-  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 
 /** Minutes between now and a medication's "HH:mm" time, today. Negative if already passed. */
@@ -27,21 +23,24 @@ function minutesUntil(time: string, now: Date): number {
 export function getPriorityAlerts(now: Date = new Date()): PriorityAlert[] {
   const alerts: PriorityAlert[] = [];
 
+  const { bills, medicines } = getData();
+  const today = ymd(now);
+
   for (const bill of bills) {
-    if (bill.status === 'paid') continue;
-    if (isSameDay(new Date(bill.dueDate), now)) {
+    if (bill.paid) continue;
+    if (bill.dueDate === today) {
       alerts.push({
         id: `bill-${bill.id}`,
         kind: 'bill_due_today',
         title: `${bill.name} is due today`,
-        detail: `£${bill.amount.toFixed(2)} via ${bill.method}`,
+        detail: `${formatGBP(bill.amount)} · ${bill.category}`,
       });
     }
   }
 
-  for (const med of medications) {
+  for (const med of medicines) {
     const mins = minutesUntil(med.time, now);
-    if (mins <= 5 && mins >= -1 && !med.taken) {
+    if (mins <= 5 && mins >= -1 && med.takenOn !== today) {
       alerts.push({
         id: `med-${med.id}-${med.time}`,
         kind: 'medication_due_soon',

@@ -1,12 +1,12 @@
-import { LayoutGrid, FileText, Plus, CalendarDays, Plus as PlusIcon } from 'lucide-react';
+import { LayoutGrid, FileText, Pill, CalendarDays } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { user } from '../lib/sampleData';
 import PriorityAlertBanner from '../components/PriorityAlertBanner';
 
 const NAV = [
-  { to: '/dashboard', label: 'Overview', icon: LayoutGrid, end: true },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutGrid, end: true },
   { to: '/dashboard/bills', label: 'Bills & payments', icon: FileText },
-  { to: '/dashboard/medicines', label: 'Medicines', icon: Plus },
+  { to: '/dashboard/medicines', label: 'Medicines', icon: Pill },
   { to: '/dashboard/appointments', label: 'Appointments', icon: CalendarDays },
 ];
 
@@ -57,7 +57,7 @@ export default function DashboardLayout() {
             <p className="text-sm text-[var(--ds-muted)] mt-2">
               One place for the things that matter.
             </p>
-            <p className="text-xs text-[var(--ds-muted)] mt-2">Interactive design preview</p>
+            <p className="text-xs text-[var(--ds-muted)] mt-2">Preview · what you add is saved in this browser only</p>
           </div>
           <button
             onClick={() => navigate('/')}
@@ -117,10 +117,3 @@ export default function DashboardLayout() {
   );
 }
 
-export function AddNewButton() {
-  return (
-    <button className="flex items-center gap-2 bg-[var(--ds-accent)] text-white font-semibold rounded-xl px-4 md:px-5 py-2.5 hover:opacity-90 text-sm md:text-base">
-      <PlusIcon size={16} /> <span className="hidden sm:inline">Add new</span>
-    </button>
-  );
-}

@@ -1,27 +1,32 @@
 import { useEffect, useRef, useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
-import { getPriorityAlerts, type PriorityAlert } from '../lib/alerts';
+import { getPriorityAlerts } from '../lib/alerts';
 import { playAlarm } from '../lib/alarmSound';
+import { useStore } from '../lib/store';
 
 const CHECK_INTERVAL_MS = 15_000;
 
 export default function PriorityAlertBanner() {
-  const [alerts, setAlerts] = useState<PriorityAlert[]>([]);
+  const [, setTick] = useState(0);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const seenIds = useRef<Set<string>>(new Set());
+  // Re-renders straight away when something is added, paid or taken.
+  useStore();
+  const alerts = getPriorityAlerts();
+
+  // Alerts already showing count as seen, so adding a bill due today does not ring:
+  // the person just made that change themselves.
+  useEffect(() => {
+    alerts.forEach((a) => seenIds.current.add(a.id));
+  });
 
   useEffect(() => {
-    function check() {
+    const id = setInterval(() => {
       const current = getPriorityAlerts();
-      const newOnes = current.filter((a) => !seenIds.current.has(a.id));
-      if (newOnes.length > 0) {
-        playAlarm(5000);
-      }
+      if (current.some((a) => !seenIds.current.has(a.id))) playAlarm(5000);
       seenIds.current = new Set(current.map((a) => a.id));
-      setAlerts(current);
-    }
-    check();
-    const id = setInterval(check, CHECK_INTERVAL_MS);
+      setTick((t) => t + 1);
+    }, CHECK_INTERVAL_MS);
     return () => clearInterval(id);
   }, []);
 

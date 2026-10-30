@@ -4,7 +4,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import OverviewPage from './pages/OverviewPage';
 import AccountServicePage from './pages/AccountServicePage';
 import InfoPage from './pages/InfoPage';
-import PlaceholderPage from './pages/PlaceholderPage';
+import { AppointmentsPage, BillsPage, MedicinesPage } from './pages/ListPages';
 import VerifiedPage from './pages/VerifiedPage';
 
 export default function App() {
@@ -18,9 +18,9 @@ export default function App() {
         <Route path="/" element={<SignInPage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<OverviewPage />} />
-          <Route path="bills" element={<PlaceholderPage title="Bills & payments" />} />
-          <Route path="medicines" element={<PlaceholderPage title="Medicines" />} />
-          <Route path="appointments" element={<PlaceholderPage title="Appointments" />} />
+          <Route path="bills" element={<BillsPage />} />
+          <Route path="medicines" element={<MedicinesPage />} />
+          <Route path="appointments" element={<AppointmentsPage />} />
         </Route>
       </Routes>
     </HashRouter>

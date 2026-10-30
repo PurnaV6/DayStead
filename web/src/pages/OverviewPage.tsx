@@ -1,154 +1,125 @@
 import type { ReactNode } from 'react';
-import { ArrowUpRight, Check, Plus, Grid3x3 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
-import { AddNewButton } from '../layouts/DashboardLayout';
-import {
-  appointments,
-  bills,
-  medications,
-  paidTotal,
-  remainingTotal,
-  scheduledTotal,
-  trend,
-  user,
-} from '../lib/sampleData';
+import { ArrowUpRight, Check, Pill, Grid3x3 } from 'lucide-react';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import PageHeader from '../components/PageHeader';
+import { CATEGORY_COLORS, formatGBP, parseYmd, useStore, ymd, type BillCategory } from '../lib/store';
+import { user } from '../lib/sampleData';
 
-function formatGBP(n: number) {
-  return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(n);
-}
-
-const remainingCount = bills.filter((b) => b.status !== 'paid').length;
-const takenCount = medications.filter((m) => m.taken).length;
-
-const chartData = trend.current.points.map((v, i) => ({ day: i + 1, october: v }));
 
 export default function OverviewPage() {
-  const today = new Date();
+  const { bills, medicines, appointments } = useStore();
+  const now = new Date();
+  const today = ymd(now);
+
+  const monthBills = bills.filter((b) => {
+    const d = parseYmd(b.dueDate);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  });
+  const monthTotal = monthBills.reduce((sum, b) => sum + b.amount, 0);
+  const paidTotal = monthBills.filter((b) => b.paid).reduce((sum, b) => sum + b.amount, 0);
+  const remaining = monthBills.filter((b) => !b.paid);
+  const takenCount = medicines.filter((m) => m.takenOn === today).length;
+  const upcoming = appointments.filter((a) => a.date >= today).length;
+
+  const slices = Object.entries(
+    monthBills.reduce<Record<string, number>>((acc, b) => {
+      acc[b.category] = (acc[b.category] ?? 0) + b.amount;
+      return acc;
+    }, {}),
+  )
+    .map(([category, amount]) => ({ category, amount, color: CATEGORY_COLORS[category as BillCategory] ?? CATEGORY_COLORS.Other }))
+    .sort((a, b) => b.amount - a.amount);
+  const monthName = now.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div>
-          <p className="text-xs tracking-widest uppercase text-[var(--ds-muted)]">
-            Your everyday, organised
-          </p>
-          <h1 className="text-2xl md:text-3xl font-extrabold mt-3">Good morning, {user.name} ☀️</h1>
-          <p className="text-[var(--ds-muted)] mt-2">
-            A clear view of your day. One less thing to remember.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="hidden sm:flex items-center gap-2 text-xs border border-[var(--ds-line)] rounded-full px-3 py-1.5 text-[var(--ds-muted)]">
-            <span className="w-2 h-2 rounded-full bg-[var(--ds-ink)]" /> Demo · Sample data
-          </span>
-          <AddNewButton />
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Your everyday, organised"
+        title={<>Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}, {user.name}</>}
+        sub="A clear view of your day. One less thing to remember."
+        addLabel="Add new"
+      />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
         <StatCard
-          label="Remaining bills this month"
-          value={formatGBP(remainingTotal)}
-          sub={`${remainingCount} payment${remainingCount === 1 ? '' : 's'} still to record`}
+          label="Bills this month"
+          value={formatGBP(monthTotal)}
+          sub={monthBills.length ? `${monthBills.length} bill${monthBills.length === 1 ? '' : 's'} due in ${now.toLocaleDateString('en-GB', { month: 'long' })}` : 'No bills added yet'}
           icon={ArrowUpRight}
           highlight
         />
         <StatCard
-          label="Marked paid this month"
-          value={formatGBP(paidTotal)}
-          sub={`Of ${formatGBP(scheduledTotal)} scheduled`}
+          label="Still to pay"
+          value={formatGBP(monthTotal - paidTotal)}
+          sub={`${formatGBP(paidTotal)} marked paid · ${remaining.length} left`}
           icon={Check}
         />
         <StatCard
-          label="Medication check-ins today"
+          label="Medicines taken today"
           value={
             <>
               {takenCount}
-              <span className="text-[var(--ds-muted)]">/{medications.length}</span>
+              <span className="text-[var(--ds-muted)]">/{medicines.length}</span>
             </>
           }
-          sub="Recorded as taken by you"
-          icon={Plus}
+          sub={medicines.length ? 'Marked as taken by you' : 'No medicines added yet'}
+          icon={Pill}
         />
         <StatCard
           label="Upcoming appointments"
-          value={String(appointments.length)}
-          sub="Across your calendar"
+          value={String(upcoming)}
+          sub={appointments.length ? 'From today onwards' : 'No appointments added yet'}
           icon={Grid3x3}
         />
       </div>
 
       <div className="bg-white border border-[var(--ds-line)] rounded-2xl p-6 mt-6">
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-bold">Bill payment trends</h2>
-            <p className="text-sm text-[var(--ds-muted)] mt-1">
-              Cumulative monthly totals · compared on matching day numbers
+        <h2 className="text-lg font-bold">Where your money goes</h2>
+        <p className="text-sm text-[var(--ds-muted)] mt-1">Bills due in {monthName}, by category</p>
+
+        <div className="flex flex-col sm:flex-row items-center gap-8 mt-6">
+          <div className="relative w-56 h-56 shrink-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                {slices.length ? (
+                  <Pie data={slices} dataKey="amount" nameKey="category" innerRadius="68%" outerRadius="100%" paddingAngle={slices.length > 1 ? 2 : 0} stroke="none">
+                    {slices.map((s) => (
+                      <Cell key={s.category} fill={s.color} />
+                    ))}
+                  </Pie>
+                ) : (
+                  <Pie data={[{ amount: 1 }]} dataKey="amount" innerRadius="68%" outerRadius="100%" stroke="none" fill="var(--ds-line)" isAnimationActive={false} />
+                )}
+                {slices.length > 0 && <Tooltip formatter={(v) => (typeof v === 'number' ? formatGBP(v) : v)} />}
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <p className="text-xs text-[var(--ds-muted)]">Total</p>
+              <p className="text-2xl font-extrabold">{formatGBP(monthTotal)}</p>
+            </div>
+          </div>
+
+          {slices.length ? (
+            <ul className="flex-1 w-full flex flex-col gap-3">
+              {slices.map((s) => (
+                <li key={s.category} className="flex items-center gap-3 text-sm">
+                  <span className="w-3 h-3 rounded-full shrink-0" style={{ background: s.color }} />
+                  <span className="flex-1">{s.category}</span>
+                  <span className="text-[var(--ds-muted)]">{Math.round((s.amount / monthTotal) * 100)}%</span>
+                  <span className="font-semibold w-24 text-right">{formatGBP(s.amount)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="flex-1 text-[var(--ds-muted)] text-center sm:text-left">
+              Nothing here yet. Press <span className="font-semibold text-[var(--ds-ink)]">+ Add new</span> to add your first bill and the chart fills in.
             </p>
-          </div>
-          <select className="border border-[var(--ds-line)] rounded-lg px-3 py-1.5 text-sm self-start">
-            <option>Scheduled bills</option>
-            <option>Paid bills</option>
-          </select>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-6">
-          <div>
-            <p className="text-sm text-[var(--ds-muted)]">{trend.current.label}</p>
-            <p className="text-2xl font-extrabold mt-1">{formatGBP(trend.current.total)}</p>
-          </div>
-          <div>
-            <p className="text-sm text-[var(--ds-muted)]">{trend.previous.label}</p>
-            <p className="text-2xl font-extrabold mt-1">
-              {trend.previous.total === null ? 'No data' : formatGBP(trend.previous.total)}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-[var(--ds-muted)]">Difference</p>
-            <p className="text-2xl font-extrabold mt-1">Not available</p>
-            <p className="text-xs text-[var(--ds-muted)] mt-1">Add records for both months to compare</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4 mt-6 text-sm">
-          <span className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[var(--ds-accent)]" /> {trend.current.label}
-          </span>
-          <span className="flex items-center gap-2 text-[var(--ds-muted)]">
-            <span className="w-2.5 h-2.5 rounded-full border border-[var(--ds-muted)]" />{' '}
-            {trend.previous.label} · dashed
-          </span>
-        </div>
-
-        <div className="h-64 mt-4">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid vertical={false} stroke="var(--ds-line)" />
-              <XAxis dataKey="day" hide />
-              <YAxis
-                domain={[0, 1400]}
-                ticks={[0, 350, 700, 1050, 1400]}
-                tickFormatter={(v) => `£${v}`}
-                stroke="var(--ds-muted)"
-                fontSize={12}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip formatter={(value) => typeof value === 'number' && Number.isFinite(value) ? formatGBP(value) : 'No data'} />
-              <Line
-                type="monotone"
-                dataKey="october"
-                stroke="var(--ds-accent)"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          )}
         </div>
       </div>
 
       <p className="text-xs text-[var(--ds-muted)] mt-6">
-        {today.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+        {now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
       </p>
     </div>
   );
