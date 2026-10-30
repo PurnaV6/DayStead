@@ -12,6 +12,8 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 - Root `App.tsx` and `src/` are a legacy local-only prototype. Do not ship or extend it.
 - Read first: `release/LAUNCH.md` (status and blockers), `PRODUCT_SPEC.md` (product and build order), `mobile/launch-status.json` (launch checklist, all items false).
 
+**Market research** (`research/market-2026-10.md`): no verified app combines bills, meds and appointments; £3.99 is at or below comparable apps; launch with unpaid carers via councils and carers centres; paid ads won't pay back at this price; lead with the annual plan because monthly churn is the main revenue risk.
+
 **Team agents** (in `.claude/agents/`): `developer` (code changes via PR), `tester` (independent QA), `ceo` (strategy and priorities), `cfo` (pricing and unit economics).
 
 **Done so far**
