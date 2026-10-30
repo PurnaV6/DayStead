@@ -12,6 +12,16 @@ export async function connectBilling(userId:string){
 }
 export const getBillingInfo=()=>Purchases.getCustomerInfo();
 export const hasPremium=(info:CustomerInfo|null)=>Boolean(info?.entitlements.active[premiumId]);
+const unitName=(unit:string,count:number)=>{const name=unit.toLowerCase().replace(/s$/,'');return `${count} ${name}${count===1?'':'s'}`;};
+// The free trial is a store introductory offer, so its length comes from the store product,
+// never from app code. Eligibility (first-time subscribers only) is confirmed by the store sheet.
+export function freeTrialLabel(plan:PurchasesPackage):string|null{
+ const intro=plan.product.introPrice;
+ if(intro&&intro.price===0&&intro.periodNumberOfUnits>0)return unitName(intro.periodUnit,intro.periodNumberOfUnits*Math.max(1,intro.cycles))+' free';
+ const free=plan.product.defaultOption?.freePhase?.billingPeriod;
+ if(free&&free.value>0)return unitName(free.unit,free.value)+' free';
+ return null;
+}
 export async function purchasePlan(plan:PurchasesPackage){
  if(!configuredUser||!billingConfigured)throw new Error('Connect store billing first.');
  return Purchases.purchasePackage(plan);
