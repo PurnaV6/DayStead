@@ -12,6 +12,31 @@ export async function connectBilling(userId:string){
 }
 export const getBillingInfo=()=>Purchases.getCustomerInfo();
 export const hasPremium=(info:CustomerInfo|null)=>Boolean(info?.entitlements.active[premiumId]);
+const KNOWN_UNITS=['DAY','WEEK','MONTH','YEAR'];
+const unitName=(unit:string,count:number)=>{const name=unit.toLowerCase().replace(/s$/,'');return `${count} ${name}${count===1?'':'s'}`;};
+// Entitlements report Android products as the bare subscription ID ("sub"), while
+// packages use "sub:baseplan", so compare on the part before the colon.
+export function priceForEntitlement(plans:PurchasesPackage[],productIdentifier?:string|null){
+ if(!productIdentifier)return undefined;
+ return plans.find(p=>p.product.identifier===productIdentifier||p.product.identifier.split(':')[0]===productIdentifier)?.product.priceString;
+}
+// The free trial is a store introductory offer, so its length comes from the store product,
+// never from app code. Eligibility (first-time subscribers only) is confirmed by the store sheet.
+// iOS only: Apple tracks trial use per Apple ID across the subscription group, which the
+// app can't see. RevenueCat's guidance: show the trial only for a definite ELIGIBLE answer.
+// Android needs no call: Google Play only returns free-trial offers to eligible users.
+export async function iosTrialEligibility(plans:PurchasesPackage[]):Promise<Record<string,boolean>>{
+ if(Platform.OS!=='ios'||!plans.length)return {};
+ const result=await Purchases.checkTrialOrIntroductoryPriceEligibility(plans.map(p=>p.product.identifier));
+ return Object.fromEntries(Object.entries(result).map(([id,e])=>[id,e.status===Purchases.INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE]));
+}
+export function freeTrialLabel(plan:PurchasesPackage,iosEligible?:boolean):string|null{
+ const intro=plan.product.introPrice;
+ if(intro&&intro.price===0&&iosEligible===true&&intro.periodNumberOfUnits>0&&KNOWN_UNITS.includes(intro.periodUnit))return unitName(intro.periodUnit,intro.periodNumberOfUnits*Math.max(1,intro.cycles))+' free';
+ const free=plan.product.defaultOption?.freePhase?.billingPeriod;
+ if(free&&free.value>0&&KNOWN_UNITS.includes(free.unit))return unitName(free.unit,free.value)+' free';
+ return null;
+}
 export async function purchasePlan(plan:PurchasesPackage){
  if(!configuredUser||!billingConfigured)throw new Error('Connect store billing first.');
  return Purchases.purchasePackage(plan);

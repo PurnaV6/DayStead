@@ -13,9 +13,28 @@ export async function enableReminders(){
 }
 // Serialize reconciliation so rapid refreshes cannot duplicate pending notifications.
 let pending=Promise.resolve();
+// Trial-end warning. reconcileReminders cancels every scheduled notification, so the
+// warning is re-added inside each reconcile run rather than scheduled independently.
+const TRIAL_ID='daystead-trial-end',TRIAL_NOTICE_DAYS=3;
+let trial:{endsAt:number;price:string}|null=null;
+async function scheduleTrialWarning(){
+ if(!trial)return;
+ const at=trial.endsAt-TRIAL_NOTICE_DAYS*86400000;
+ if(at<=Date.now()+60000||!(await Notifications.getPermissionsAsync()).granted)return;
+ const day=new Date(trial.endsAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+ await Notifications.scheduleNotificationAsync({identifier:TRIAL_ID,content:{title:'Your free month ends soon',body:`Your Daystead trial ends on ${day}. You'll be charged ${trial.price} then unless you cancel before it ends. If you've already cancelled, you won't be charged.`,sound:'default'},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:new Date(at),channelId:'daystead'}});
+}
+// Pass null when there is no trial that will turn into a charge (not trialling, or already cancelled).
+export function setTrialWarning(next:{endsAt:Date;price:string}|null){
+ trial=next?{endsAt:+next.endsAt,price:next.price}:null;
+ const run=async()=>{await Notifications.cancelScheduledNotificationAsync(TRIAL_ID).catch(()=>{});await scheduleTrialWarning();};
+ const result=pending.then(run,run);pending=result.then(()=>{},()=>{});return result;
+}
 export function reconcileReminders(items:Occurrence[], enabled:boolean){
  const run=async()=>{
   await Notifications.cancelAllScheduledNotificationsAsync();
+  // A billing notice, not a schedule reminder: kept even when schedule reminders are off.
+  await scheduleTrialWarning();
   if(!enabled){await replaceAlarms([]);return {count:0,through:null,alarmNote:''};}
   const permission=await Notifications.getPermissionsAsync();
   if(!permission.granted){await replaceAlarms([]);return {count:0,through:null,alarmNote:'Notifications are not allowed.'};}

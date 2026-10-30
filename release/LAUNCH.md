@@ -16,13 +16,13 @@
 ## Owner configuration required
 
 1. Register Apple Developer and Google Play accounts under the chosen legal identity. Confirm `com.provifi.daystead` identifiers before registering store apps. Set up owner Expo/EAS project inside `mobile/`.
-2. Create RevenueCat project and iOS/Android apps. Define `premium` entitlement. Attach monthly and annual auto-renewable subscriptions to a default offering. Set UK prices to £3.99 and £35.99. Configure any one-month trial only if wanted and supported; app makes no unconditional trial promise.
+2. Create RevenueCat project and iOS/Android apps. Define `premium` entitlement. Attach monthly and annual auto-renewable subscriptions to a default offering. Set UK prices to £3.99 and £35.99. Add a 1-month free trial introductory offer to both subscriptions (App Store Connect: introductory offer, free, 1 month; Play Console: free-trial base-plan offer, P1M, new customers only). The app reads the trial length from the store and only advertises a trial when the store offers one. It schedules a reminder 3 days before a renewing trial ends.
 3. Set public SDK keys in EAS: `EXPO_PUBLIC_REVENUECAT_IOS_KEY`, `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY`. Enable billing only for signed sandbox testing first using `EXPO_PUBLIC_ENABLE_BILLING=true`. Never put secret API keys in Expo public variables.
 4. Deploy `supabase/subscription-sync.sql` on the existing project `jlhhzmngotahugxjrdnk`. Deploy `revenuecat-webhook`, with its own authentication and JWT gateway disabled. Set server-only `REVENUECAT_SECRET_KEY` and a long unique `REVENUECAT_WEBHOOK_AUTH`; configure the exact same Authorization header in RevenueCat. Register the function HTTPS endpoint. Keep `REVENUECAT_ALLOW_SANDBOX` unset in production. Use a separate backend/RevenueCat app for testing.
 5. Deploy `supabase/functions/delete-account/index.ts` as `delete-daystead-account`. Its body verifies the caller with Supabase Auth before any privileged deletion. The standard Supabase server secrets must be available. Verify an unauthenticated call returns 401 and deletion only affects a disposable test user.
 6. Set real support email and reviewed public policy URLs: `EXPO_PUBLIC_SUPPORT_EMAIL`, `EXPO_PUBLIC_PRIVACY_URL`, `EXPO_PUBLIC_TERMS_URL`. Domain purchase alone does not provide email. Configure verified transactional email and Auth redirects.
 
-## Remaining release blockers — this branch is NOT store-ready
+## Remaining release blockers: this branch is NOT store-ready
 
 - Reminder queue still has a 48-alert bound. Reminder preference now persists per account on each phone. Background queue replenishment, sleeping-device edits, course endings and subscription-expiry cancellation must pass physical-device tests before charging users. Do not market this build as a reliable alarm service.
 - SDK entitlement gating is integrated for scheduling; the full server-enforced billing and seven-day failed-renewal policy still needs store setup, reconciliation and device tests. Store-granted access must be honoured; do not assume both stores offer an identical seven-day grace configuration.

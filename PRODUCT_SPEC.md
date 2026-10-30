@@ -87,7 +87,7 @@ not the mobile MVP.
 
 | Plan | Price |
 |---|---|
-| Full-feature trial | 30 days free |
+| Full-feature trial | 1 month free for new subscribers (store introductory offer); auto-renews into the chosen plan unless cancelled before it ends; reminder 3 days before |
 | Monthly | £3.99 |
 | Annual | £35.99 |
 
