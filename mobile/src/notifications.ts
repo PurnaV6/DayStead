@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
+import {alarmStatus,replaceAlarms} from './alarm';
 import {Platform} from 'react-native';
-import {Occurrence, plannedAlerts} from './domain';
+import {Occurrence, plannedAlerts, nativeAlarmCandidates} from './domain';
 
 Notifications.setNotificationHandler({handleNotification:async()=>({shouldShowBanner:true,shouldShowList:true,shouldPlaySound:true,shouldSetBadge:false})});
 export async function enableReminders(){
@@ -15,17 +16,26 @@ let pending=Promise.resolve();
 export function reconcileReminders(items:Occurrence[], enabled:boolean){
  const run=async()=>{
   await Notifications.cancelAllScheduledNotificationsAsync();
-  if(!enabled)return {count:0,through:null};
+  if(!enabled){await replaceAlarms([]);return {count:0,through:null,alarmNote:''};}
   const permission=await Notifications.getPermissionsAsync();
-  if(!permission.granted)return {count:0,through:null};
+  if(!permission.granted){await replaceAlarms([]);return {count:0,through:null,alarmNote:'Notifications are not allowed.'};}
   // Bounded development queue. A production server scheduler is required before launch.
-  const alerts=plannedAlerts(items,new Date()).slice(0,48);
+  const status=await alarmStatus();
+  const alarmItems=nativeAlarmCandidates(items,items.length);
+  const nativeReady=status==='authorized';
+  let alarmNote=alarmItems.length&&!nativeReady?'Alarm unavailable ('+status+'); using gentle reminders.':'';
+  let nativeItems=nativeReady?alarmItems.slice(0,48):[];
+  try { await replaceAlarms(nativeItems.map(o=>({key:o.key,at:+o.at}))); }
+  catch(error) { await replaceAlarms([]); nativeItems=[]; alarmNote='Native alarm scheduling failed; using gentle reminders. '+(error instanceof Error?error.message:'Check phone settings.'); }
+  if(nativeItems.length)alarmNote=`${nativeItems.length} native alarms retained or scheduled. Alarm coverage through ${nativeItems[nativeItems.length-1].at.toLocaleDateString('en-GB')}.`;
+  const nativeKeys=new Set(nativeItems.map(o=>o.key));
+  const alerts=plannedAlerts(items,new Date()).filter(a=>!(a.minutes===0&&nativeKeys.has(a.occurrence.key))).slice(0,48);
   for(const alert of alerts)await Notifications.scheduleNotificationAsync({
    identifier:alert.occurrence.key+'|'+alert.minutes,
    content:{title:'Daystead reminder',body:'You have a scheduled item. Open Daystead to review it.',sound:'default',data:{scheduleId:alert.occurrence.schedule.id,occurrenceAt:alert.occurrence.at.toISOString()}},
    trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:alert.at,channelId:'daystead'}
   });
-  return {count:alerts.length,through:alerts.at(-1)?.at??null};
+  return {count:alerts.length,through:alerts.at(-1)?.at??null,alarmNote};
  };
  const result=pending.then(run,run);pending=result.then(()=>{},()=>{});return result;
 }
