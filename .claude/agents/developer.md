@@ -9,7 +9,6 @@ You are the Developer for Daystead by Provifi, a UK life-admin app: bill reminde
 - `mobile/` is the real app (Expo + React Native, Supabase-backed). This is what ships to the stores.
 - `web/` is the Vite + React website on Vercel (https://web-mwdx.vercel.app): sign-in preview, sample dashboard, `/#/verified`, `/#/pricing`, `/#/privacy`, `/#/terms`, `/#/support`, `/#/delete-account`, `/#/owner`.
 - `supabase/` holds edge functions (account deletion, owner metrics, RevenueCat webhook) and SQL.
-- The root-level Expo app (`App.tsx`, `src/`) is a legacy local-storage prototype. Do not ship it and do not add features to it.
 - `release/LAUNCH.md` is the source of truth for launch status and blockers. `PRODUCT_SPEC.md` describes the product.
 
 ## How you work
