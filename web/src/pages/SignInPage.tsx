@@ -1,111 +1,85 @@
-import { FileText, Plus, Grid3x3 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useState, type FormEvent } from 'react';
+import { Calendar, FileText, PlusSquare } from 'lucide-react';
+import { AUTH_REDIRECT, supabase } from '../lib/supabase';
 
+// Same sign-in, sign-up and reset flow as the auth screen in mobile/App.tsx.
 const FEATURES = [
   { icon: FileText, label: 'Know what is due and what to keep available' },
-  { icon: Plus, label: 'Organise your own medication schedule' },
-  { icon: Grid3x3, label: 'Keep your upcoming commitments together' },
+  { icon: PlusSquare, label: 'Organise your own medication schedule' },
+  { icon: Calendar, label: 'Keep your upcoming commitments together' },
 ];
 
+const input = 'w-full border border-[var(--ds-line)] rounded-xl px-4 py-3 bg-[#FCFCF8] outline-none focus:border-[var(--ds-accent)]';
+
 export default function SignInPage() {
-  const navigate = useNavigate();
+  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMessage('');
+    try {
+      if (mode === 'signup') {
+        if (!name.trim()) throw new Error('Enter your name.');
+        const { data, error } = await supabase.auth.signUp({ email: email.trim(), password, options: { data: { full_name: name.trim() }, emailRedirectTo: AUTH_REDIRECT } });
+        if (error) throw error;
+        if (!data.session) setMessage('Check your email to confirm your account, then sign in here or in the phone app.');
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+        if (error) throw error;
+      }
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : 'Please try again.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function forgot() {
+    if (!email.trim()) return setMessage('Enter your email first.');
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: AUTH_REDIRECT });
+    setBusy(false);
+    setMessage(error ? error.message : 'If your account exists, a reset link will arrive.');
+  }
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden md:flex md:w-1/2 flex-col justify-center px-16 py-12 bg-[var(--ds-accent-tint)]">
-        <div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-extrabold tracking-tight text-[var(--ds-accent)]">
-              daystead
-            </span>
-            <span className="text-[var(--ds-accent)]">•</span>
-          </div>
-          <p className="text-xs tracking-widest uppercase text-[var(--ds-muted)] mt-1">
-            by Provifi
-          </p>
-
-          <h1 className="text-5xl font-extrabold leading-tight mt-10 text-[var(--ds-ink)]">
-            A clearer day.
-            <br />A lighter mind.
-          </h1>
-
-          <p className="mt-6 text-lg text-[var(--ds-muted)] max-w-sm">
-            Your bills, medication schedules and appointments. One calm place to keep life in
-            order.
-          </p>
-
-          <div className="mt-10 divide-y divide-[var(--ds-accent-line)]">
-            {FEATURES.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-3 py-4">
-                <Icon size={18} className="text-[var(--ds-ink)] shrink-0" />
-                <span className="text-[var(--ds-ink)]">{label}</span>
-              </div>
-            ))}
-          </div>
+    <div className="min-h-screen flex bg-[var(--ds-paper)]">
+      <div className="hidden md:flex md:w-1/2 flex-col justify-center px-16 py-12 bg-[#EDF2E9]">
+        <p className="text-[10px] font-bold tracking-[.18em] text-[var(--ds-muted)]">PROVIFI PRESENTS</p>
+        <p className="text-[43px] font-bold tracking-tighter text-[var(--ds-ink)]">daystead.</p>
+        <h1 className="text-5xl font-semibold leading-tight tracking-tight mt-8 text-[var(--ds-ink)]">A little order.<br />A lighter day.</h1>
+        <p className="mt-6 text-lg text-[var(--ds-muted)] max-w-sm">Your bills, medicines and appointments. One calm place to stay on top of life.</p>
+        <div className="mt-10 divide-y divide-[var(--ds-line)]">
+          {FEATURES.map(({ icon: Icon, label }) => (
+            <div key={label} className="flex items-center gap-3 py-4"><Icon size={18} className="text-[var(--ds-accent)] shrink-0" /><span>{label}</span></div>
+          ))}
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-white">
-        <div className="w-full max-w-md">
-          <p className="text-xs tracking-widest uppercase text-[var(--ds-muted)] mb-2">
-            Your personal workspace
-          </p>
-          <h2 className="text-3xl font-extrabold">Welcome back</h2>
-          <p className="text-[var(--ds-muted)] mt-2 mb-8">Sign in to your Daystead account.</p>
-
-          <label className="block text-sm font-medium mb-1">Email address</label>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            className="w-full border border-[var(--ds-line)] rounded-xl px-4 py-3 mb-5 outline-none focus:border-[var(--ds-accent)]"
-            disabled
-          />
-
-          <label className="block text-sm font-medium mb-1">Password</label>
-          <div className="relative mb-6">
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="w-full border border-[var(--ds-line)] rounded-xl px-4 py-3 outline-none focus:border-[var(--ds-accent)]"
-              disabled
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-[var(--ds-muted)]">
-              Show
-            </span>
-          </div>
-
-          <button
-            disabled
-            className="w-full bg-[var(--ds-accent)] text-white font-semibold rounded-xl py-3 opacity-80 cursor-not-allowed"
-          >
-            Sign in (setup pending)
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <form onSubmit={submit} className="w-full max-w-md bg-white border border-[var(--ds-line)] rounded-[22px] p-6 flex flex-col gap-4">
+          <p className="md:hidden text-[34px] font-bold tracking-tighter text-[var(--ds-ink)]">daystead.</p>
+          <h2 className="text-2xl font-semibold">{mode === 'signup' ? 'Make yourself at home' : 'Welcome back'}</h2>
+          <p className="text-sm text-[var(--ds-muted)] -mt-2">Use the same account as the Daystead phone app.</p>
+          {mode === 'signup' && <label className="flex flex-col gap-1.5 text-sm font-semibold">Your name<input className={input} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" /></label>}
+          <label className="flex flex-col gap-1.5 text-sm font-semibold">Email<input className={input} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></label>
+          <label className="flex flex-col gap-1.5 text-sm font-semibold">Password<input className={input} type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} /></label>
+          <button disabled={busy || password.length < 8} className="min-h-[50px] rounded-[14px] bg-[var(--ds-accent)] text-white font-semibold disabled:opacity-45">
+            {busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
           </button>
-
-          <div className="flex justify-between mt-4 text-sm">
-            <a href="#" className="text-[var(--ds-accent)] font-medium">
-              Create an account
-            </a>
-            <a href="#" className="text-[var(--ds-accent)] font-medium">
-              Forgot password?
-            </a>
-          </div>
-
-          <div className="mt-6 bg-[#FBF4E3] border border-[#EADFC0] rounded-xl p-4 text-sm text-[#5B4E2B]">
-            Account setup is pending. This preview does not collect passwords or create
-            accounts. Cloud login and device synchronisation will be enabled after the database
-            is connected.
-          </div>
-
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="w-full mt-6 border border-[var(--ds-line)] rounded-xl py-3 font-medium hover:bg-[var(--ds-bg)] flex items-center justify-center gap-2"
-          >
-            Explore the sample dashboard <span aria-hidden>→</span>
+          <button type="button" onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setMessage(''); }} className="min-h-[50px] rounded-[14px] bg-[#EDF2E9] font-semibold">
+            {mode === 'signup' ? 'Already have an account? Sign in' : 'New here? Create account'}
           </button>
-          <p className="text-center text-xs text-[var(--ds-muted)] mt-3">
-            Demo changes stay in this browser only.
-          </p>
-        </div>
+          <button type="button" onClick={() => void forgot()} disabled={busy} className="text-[var(--ds-accent)] font-semibold text-left">Forgot your password?</button>
+          {message && <p role="status" className="text-sm">{message}</p>}
+          <p className="text-xs text-[var(--ds-muted)]">1 month free for new subscribers, then £3.99 a month or £35.99 a year. Subscriptions are managed in the phone app.</p>
+        </form>
       </div>
     </div>
   );

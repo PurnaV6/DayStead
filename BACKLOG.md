@@ -11,6 +11,8 @@ The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION
 - [ ] Apple and Google developer accounts, a RevenueCat project, the 1-month free trial offers, and a real support email. [blocked: owner]
 
 ## Next up (agents)
+Every item is built in the phone app and on the website in the same PR.
+
 1. [ ] **First-run setup on mobile.** After sign-up, a 3-step guide: set your payday, add your first bill (with the quick-add templates), and turn on reminders. Each step can be skipped. Activation is the main early risk.
 2. [ ] **Missed items from earlier months.** Today's "Needs your attention" only looks back to the 1st of this month, so a bill missed in late October disappears on 1 November. Look back 35 days. Depends on PR #9.
 3. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
@@ -25,3 +27,4 @@ The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION
 - 1-month free trial paywall code, a 3-day trial-end reminder, and the annual saving badge.
 - Quick-add UK bill templates and "Who is this for?" (PR #6).
 - A + button on every tab, and a Dashboard tab with the bill total and donut chart (PR #8).
+- The website is now the signed-in web version of the app, with the same features as mobile.
