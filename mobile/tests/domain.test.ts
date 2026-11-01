@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates} from '../src/domain.ts';
+import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps} from '../src/domain.ts';
 import type {Schedule} from '../src/domain.ts';
 const base:Schedule={id:'bill1',user_id:'u1',kind:'bill',title:'Rent',category:'Rent',amount_pence:95000,due_at:new Date(2026,0,31,9).toISOString(),repeat_rule:'monthly',end_at:null,notes:'',version:1};
 test('month end recurrence clamps February and returns to March 31',()=>{
@@ -76,4 +76,23 @@ test('to-do recurrence and completion use the same occurrence identity as appoin
  const items=occurrences([todo],new Date(2026,0,31),new Date(2026,1,15));
  const completed=occurrences([todo],new Date(2026,0,31),new Date(2026,1,15),[{schedule_id:todo.id,occurrence_at:items[0].at.toISOString(),status:'completed'}]);
  assert.equal(completed[0].status,'completed');assert.equal(completed[1].status,undefined);
+});
+test('a bill is missed only once its due day has ended unpaid',()=>{
+ const bill={schedule:base,at:new Date(2026,0,31,9),key:'k'};
+ assert.equal(isMissed(bill,new Date(2026,0,31,23)),false);
+ assert.equal(isMissed(bill,new Date(2026,1,1,0,1)),true);
+ assert.equal(isMissed({...bill,status:'paid'},new Date(2026,1,5)),false);
+});
+test('a dose is missed 30 minutes after its time; appointments never are',()=>{
+ const dose={schedule:{...base,kind:'medicine' as const},at:new Date(2026,1,1,8),key:'d'};
+ assert.equal(isMissed(dose,new Date(2026,1,1,8,29)),false);
+ assert.equal(isMissed(dose,new Date(2026,1,1,8,30)),true);
+ assert.equal(isMissed({...dose,status:'taken'},new Date(2026,1,1,9)),false);
+ assert.equal(isMissed({...dose,schedule:{...base,kind:'appointment' as const}},new Date(2026,2,1)),false);
+});
+test('missed follow-ups: 9am the day after a bill, 30 minutes after a dose, none once recorded',()=>{
+ const bill={schedule:base,at:new Date(2026,0,31,9),key:'k'};
+ const dose={schedule:{...base,kind:'medicine' as const},at:new Date(2026,1,1,8),key:'d'};
+ assert.deepEqual(missedFollowUps([dose,bill],new Date(2026,0,30)).map(f=>+f.at),[+new Date(2026,1,1,8,30),+new Date(2026,1,1,9)].sort((a,b)=>a-b));
+ assert.equal(missedFollowUps([{...bill,status:'paid'},{...dose,status:'skipped'}],new Date(2026,0,30)).length,0);
 });

@@ -16,7 +16,8 @@ A scheduled task wakes the Daystead team session twice a day. Each run is one **
    - Post a short report in the session: the PR link, what changed, what was tested, what still needs a phone or the owner, and any Supabase step needed.
 
 ## Hard rules
-- **Mobile first.** Work on `mobile/` unless the backlog item says otherwise. The website changes only when the owner asks.
+- **Mobile first, website in step.** Build every feature in `mobile/` first, then add the same feature to the website (`web/src/app/`) in the same PR. The website is the signed-in web version of the app, with the same account, data, tabs and features. Phone-only features (notifications, alarms, store purchases) get a short note on the web instead.
+- `web/src/lib/domain.ts` must stay an exact copy of `mobile/src/domain.ts`. Run `cd web && npm run check:shared`.
 - **Never merge, and never push to `main`.** The owner reviews and merges every PR.
 - **Never change the live Supabase project, store accounts, RevenueCat or Vercel settings.** If a task needs SQL, add a file under `supabase/` and tell the owner exactly what to run.
 - **Never spend money**, sign up for services, or contact anyone outside the repo.
