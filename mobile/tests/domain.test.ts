@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps} from '../src/domain.ts';
+import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps,attentionStart,completionsSince} from '../src/domain.ts';
 import type {Schedule} from '../src/domain.ts';
 const base:Schedule={id:'bill1',user_id:'u1',kind:'bill',title:'Rent',category:'Rent',amount_pence:95000,due_at:new Date(2026,0,31,9).toISOString(),repeat_rule:'monthly',end_at:null,notes:'',version:1};
 test('month end recurrence clamps February and returns to March 31',()=>{
@@ -95,4 +95,22 @@ test('missed follow-ups: 9am the day after a bill, 30 minutes after a dose, none
  const dose={schedule:{...base,kind:'medicine' as const},at:new Date(2026,1,1,8),key:'d'};
  assert.deepEqual(missedFollowUps([dose,bill],new Date(2026,0,30)).map(f=>+f.at),[+new Date(2026,1,1,8,30),+new Date(2026,1,1,9)].sort((a,b)=>a-b));
  assert.equal(missedFollowUps([{...bill,status:'paid'},{...dose,status:'skipped'}],new Date(2026,0,30)).length,0);
+});
+
+test('attention looks back 35 days, so last month\'s unpaid bill stays after the 1st',()=>{
+ const now=new Date(2026,10,1,9);
+ const bill={...base,due_at:new Date(2026,8,30,9).toISOString()};
+ const start=attentionStart(now);
+ assert.deepEqual([start.getFullYear(),start.getMonth(),start.getDate(),start.getHours()],[2026,8,27,0]);
+ const items=occurrences([bill],start,new Date(2026,10,4),[]).filter(o=>!o.status);
+ assert.deepEqual(items.map(o=>[o.at.getMonth(),o.at.getDate()]),[[8,30],[9,30]]);
+ assert.ok(isMissed(items[1],now));
+ const paid=occurrences([bill],start,new Date(2026,10,4),[{schedule_id:bill.id,occurrence_at:items[1].at.toISOString(),status:'paid'}]).filter(o=>!o.status);
+ assert.deepEqual(paid.map(o=>o.at.getDate()),[30]);
+ assert.equal(paid[0].at.getMonth(),8);
+});
+
+test('completions are loaded from the earlier of last month\'s 1st and 35 days ago',()=>{
+ const a=completionsSince(new Date(2026,10,1,9));assert.deepEqual([a.getMonth(),a.getDate()],[8,27]);
+ const b=completionsSince(new Date(2026,10,30,9));assert.deepEqual([b.getMonth(),b.getDate()],[9,1]);
 });
