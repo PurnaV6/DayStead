@@ -15,13 +15,18 @@ export function BillDonut({current,size=146}:{current:Occurrence[];size?:number}
   <View style={{flex:1,gap:8}}>{entries.map(([label,value],i)=><Text key={label} style={{color:'#193D31',fontSize:13}}><Text style={{color:palette[i%palette.length]}}>●</Text> {label} · {pounds(value)}</Text>)}{!entries.length&&<Text style={{color:'#68756E',fontSize:14,lineHeight:21}}>No bills this month yet. Tap + to add your first bill and the chart fills in.</Text>}</View>
  </View>;
 }
-export function BillCharts({current,previous}:{current:Occurrence[];previous:Occurrence[]}){
+// This month vs last month, cumulative by day of month.
+export function BillTrend({current,previous}:{current:Occurrence[];previous:Occurrence[]}){
  const sum=total(current),prior=total(previous);
  const points=(items:Occurrence[])=>Array.from({length:31},(_,i)=>({x:12+i*9,y:120-items.filter(o=>o.at.getDate()<=i+1).reduce((s,o)=>s+(o.schedule.amount_pence||0),0)/Math.max(sum,prior,1)*100})).map(p=>`${p.x},${p.y}`).join(' ');
- return <View style={{gap:16}}><Text style={{fontSize:20,fontWeight:'600',color:'#193D31'}}>Where your money goes</Text>
- <BillDonut current={current}/>
- <Text style={{fontSize:20,fontWeight:'600',color:'#193D31'}}>Monthly bill trend</Text><Text style={{color:'#68756E'}}>Cumulative scheduled bills · this month vs last month</Text>
+ return <View style={{gap:16}}>
+ <Text style={{fontSize:20,fontWeight:'600',color:'#193D31'}}>This month vs last month</Text><Text style={{color:'#68756E'}}>Cumulative bills by day of the month · last month dashed</Text>
  <Svg width="100%" height={145} viewBox="0 0 300 145"><Line x1={12} x2={282} y1={120} y2={120} stroke="#D8DFD7"/>{previous.length>0&&<Polyline points={points(previous)} fill="none" stroke="#B1B6AD" strokeWidth={3} strokeDasharray="5 5"/>}{current.length>0&&<Polyline points={points(current)} fill="none" stroke="#2D6554" strokeWidth={3}/>}</Svg>
  <Text style={{color:'#68756E'}}>1st                         15th                         31st</Text>
  <Text style={{color:'#193D31'}}>{!previous.length?'No previous-month data to compare.':`${pounds(Math.abs(sum-prior))} ${sum>=prior?'more':'less'} than last month${prior?' · '+Math.abs((sum-prior)/prior*100).toFixed(1)+'%':''}`}</Text></View>;
+}
+export function BillCharts({current,previous}:{current:Occurrence[];previous:Occurrence[]}){
+ return <View style={{gap:16}}><Text style={{fontSize:20,fontWeight:'600',color:'#193D31'}}>Where your money goes</Text>
+ <BillDonut current={current}/>
+ <BillTrend current={current} previous={previous}/></View>;
 }

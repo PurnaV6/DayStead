@@ -4,7 +4,7 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 
 **What it is.** Daystead by Provifi ("Your day, in order.") is a UK subscription app that puts bill reminders with "money needed before payday", medication reminders (including alarm-style alerts) and appointments/to-dos in one place. Owner: Purna Vemula.
 
-**Mobile first.** The phone app in `mobile/` is the product. Make every change there unless the owner names the website. The website is secondary.
+**Mobile first, website kept in step.** The phone app in `mobile/` is the product. Every feature is built there first and then added to the website in the same PR. The website (`web/`, https://web-mwdx.vercel.app) is the signed-in web version: same Supabase account and data, the same 6 tabs, the + button, the charts and the red missed items. Phone-only features (notifications, alarms, store purchases) get a note on the web instead. `web/src/lib/domain.ts` is an exact copy of `mobile/src/domain.ts` (`cd web && npm run check:shared`).
 
 **Price (decided).** 1 month free for new subscribers, then £3.99/month or £35.99/year; no permanent free tier. Cancelling before the trial ends means no charge, and the app reminds users 3 days before. You keep about £2.83/month or £25.49/year per subscriber after VAT and the 15% store fee. Running costs are about £53/month once launched, so break-even is about 22 paying subscribers. Paid ads lose money at this price (about £75 to £370 per paying user against a lifetime value of about £34), so growth must come from partnerships, communities and App Store search.
 
@@ -37,6 +37,6 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 4. Supabase leaked-password protection is off.
 5. Reminder reliability on a physical phone (background refresh, course endings, subscription expiry) is untested. Do not market as a reliable alarm yet.
 6. No store accounts, RevenueCat project, real support email, or reviewed privacy/terms yet.
-7. Web dashboard Bills, Medicines and Appointments tabs are placeholders (low priority: mobile first).
+7. Subscriptions are not yet checked on the website. Once billing goes live, the web must read `daystead_subscriptions` before allowing new schedules, as the phone does with RevenueCat.
 
 **Rules.** No em dashes in user-facing text. Money in pence. Calendar dates from local date parts, not `toISOString()`. Never mark a launch checklist item true without evidence. Never put secret keys in the repo or in `EXPO_PUBLIC_*` variables.
