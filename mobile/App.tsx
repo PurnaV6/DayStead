@@ -8,7 +8,7 @@ import {StatusBar} from 'expo-status-bar';
 import {Feather} from '@expo/vector-icons';
 import type {Session} from '@supabase/supabase-js';
 import {supabase} from './src/supabase';
-import {Completion,isMissed,monthBills,Occurrence,occurrences,pounds,Schedule,todayMedicines,formatDoseTime} from './src/domain';
+import {Completion,completionsSince,isMissed,monthBills,Occurrence,occurrences,pounds,Schedule,todayMedicines,formatDoseTime} from './src/domain';
 import {AttentionPanel} from './src/AttentionPanel';
 import {requestAlarmPermission,stopAlarm} from './src/alarm';
 import {ReminderHealth} from './src/ReminderHealth';
@@ -55,7 +55,7 @@ function Daystead(){
  const upcoming=occurrences(schedules,new Date(now.getFullYear(),now.getMonth(),now.getDate()),new Date(+now+35*86400000),done);
  async function load(userId:string){
   const request=++loadRef.current;
-  const [a,b]=await Promise.all([supabase.from('daystead_schedules').select('*').eq('user_id',userId).order('due_at'),supabase.from('daystead_completions').select('*').eq('user_id',userId)]);
+  const [a,b]=await Promise.all([supabase.from('daystead_schedules').select('*').eq('user_id',userId).order('due_at'),supabase.from('daystead_completions').select('*').eq('user_id',userId).gte('occurrence_at',completionsSince(new Date()).toISOString()).order('occurrence_at',{ascending:false})]);
   if(userRef.current!==userId||request!==loadRef.current)return;
   if(a.error||b.error)throw a.error||b.error;
   setSchedules(a.data||[]);setDone(b.data||[]);setLoadedFor(userId);
