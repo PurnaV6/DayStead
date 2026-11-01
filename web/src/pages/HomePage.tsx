@@ -42,7 +42,7 @@ function PaydaySum() {
               <label key={b.name} className="flex items-center gap-3 sm:gap-4 py-3.5 cursor-pointer group">
                 <input type="checkbox" checked={on[b.name]} onChange={() => setOn({ ...on, [b.name]: !on[b.name] })} className="w-6 h-6 accent-[var(--ink)] shrink-0" />
                 <span className="flex-1 min-w-0 text-[17px] sm:text-[18px] font-medium">{b.name}</span>
-                <span className="text-[15px] sm:text-[16px] text-[var(--soft-ink)] w-[72px] sm:w-24 shrink-0"><span className="hidden sm:inline">due the </span>{ord(b.day)}</span>
+                <span className="text-[15px] sm:text-[16px] text-[var(--soft-ink)] w-[72px] sm:w-[120px] shrink-0 whitespace-nowrap"><span className="hidden sm:inline">due the </span>{ord(b.day)}</span>
                 <span className={`tnum text-[17px] sm:text-[18px] w-[84px] sm:w-24 shrink-0 text-right transition-opacity duration-300 ${counts ? 'opacity-100' : 'opacity-40'}`}>{pounds(b.pence)}</span>
               </label>
             );
@@ -51,7 +51,7 @@ function PaydaySum() {
       </div>
       <div className="lg:sticky lg:top-40 rounded-[32px] bg-[var(--ink)] text-[var(--ground)] p-8 md:p-10 flex flex-col gap-4" data-reveal style={{ ['--i' as string]: 3 }}>
         <p className="text-[18px] text-[var(--on-deep)]">Keep aside before the {ord(payday)}</p>
-        <p className="display tnum text-[60px] sm:text-[72px] md:text-[96px]" aria-live="polite">{pounds(total)}</p>
+        <p className="display tnum text-[60px] sm:text-[72px] md:text-[96px] text-[var(--highlight)]" aria-live="polite">{pounds(total)}</p>
         <p className="text-[16px] leading-relaxed text-[var(--on-deep)]">
           {counted.length ? `${counted.map((b) => b.name).join(', ')}.` : 'No ticked bills fall before payday.'} Bills due after payday wait for next month's pay.
         </p>
@@ -92,7 +92,7 @@ export default function HomePage() {
 
       <div className="bg-[var(--ink)] text-[var(--on-deep)] overflow-hidden py-5" aria-hidden="true">
         <div className="marquee gap-10 text-[22px] font-medium whitespace-nowrap">
-          {[...STRIP, ...STRIP].map((s, i) => <span key={i} className="flex items-center gap-10">{s}<span className="w-2 h-2 rounded-full bg-[#7FA08C]" /></span>)}
+          {[...STRIP, ...STRIP].map((s, i) => <span key={i} className="flex items-center gap-10">{s}<span className="w-2 h-2 rounded-full bg-[var(--highlight)]" /></span>)}
         </div>
       </div>
 
@@ -235,7 +235,7 @@ export default function HomePage() {
             <p className="text-[16px] text-[var(--soft-ink)]">a month</p>
           </div>
           <div className="rounded-[28px] bg-[var(--ink)] text-[var(--ground)] p-7 flex flex-col gap-1">
-            <p className="text-[17px]">Yearly, save 25%</p>
+            <p className="text-[17px]">Yearly, <span className="text-[var(--highlight)] font-semibold">save 25%</span></p>
             <p className="display tnum text-[56px] md:text-[72px]">£35.99</p>
             <p className="text-[16px] text-[var(--on-deep)]">a year, about £3 a month</p>
           </div>

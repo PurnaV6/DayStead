@@ -10,6 +10,7 @@
   --on-deep: #e9f0e6;
   --soft-ink: #4b5f55;   /* secondary text, still AA on ground */
   --missed: #b3261e;
+  --highlight: #e9b44c; /* warm amber: a few small moments only, never for missed items */
   --card: #ffffff;
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -34,7 +35,7 @@
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  font-family: 'Inter Tight', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color: var(--ink);
   background: var(--ground);
   -webkit-font-smoothing: antialiased;
@@ -43,7 +44,7 @@ body {
 ::selection { background: var(--ink); color: var(--ground); }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
-.display { letter-spacing: -0.045em; line-height: 0.95; font-weight: 600; }
+.display { letter-spacing: -0.04em; line-height: 0.98; font-weight: 700; }
 .tnum { font-variant-numeric: tabular-nums; }
 
 /* Buttons: fully round, flat, one fill. */

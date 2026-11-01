@@ -80,7 +80,7 @@ function Footer() {
             {SUPPORT_EMAIL && <a className="link-u self-start" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>}
           </div>
         </div>
-        <p aria-hidden="true" className="display text-[22vw] md:text-[17vw] leading-[.8] text-white -ml-[0.04em] select-none">DayStead.</p>
+        <p aria-hidden="true" className="display text-[18.5vw] md:text-[15vw] leading-[.8] text-white -ml-[0.04em] select-none">DayStead.</p>
         <div className="flex flex-col sm:flex-row justify-between gap-3 text-[14px] text-[#b9cbbf]">
           <p>© {YEAR} DayStead by Provifi. Your day, in order.</p>
           <p>Photographs from Unsplash.</p>
