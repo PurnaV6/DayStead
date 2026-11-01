@@ -222,7 +222,7 @@ export function PlannerPage() {
 }
 
 export function AccountPage() {
-  const { session, refresh, busy } = useDaystead();
+  const { session, refresh, busy, openSetup } = useDaystead();
   const [message, setMessage] = useState('');
   async function exportData() {
     if (!window.confirm('Your export includes bill and medicine details. Save it somewhere private.')) return;
@@ -251,6 +251,11 @@ export function AccountPage() {
         <p className="text-[var(--ds-muted)]">{session.user.email}</p>
         <Button secondary disabled={busy} onClick={() => void refresh()}>Refresh changes from your phone</Button>
         <Button secondary disabled={busy} onClick={() => void supabase.auth.signOut()}>Sign out</Button>
+      </Card>
+      <Card>
+        <Heading>Setup guide</Heading>
+        <Small>Set your payday, add a bill and see how reminders work, step by step.</Small>
+        <Button secondary onClick={openSetup}>Open the setup guide</Button>
       </Card>
       <Card>
         <Heading>Reminders</Heading>

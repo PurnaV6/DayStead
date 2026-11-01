@@ -5,6 +5,7 @@ import { occurrences, type Kind } from '../lib/domain';
 import { playAlarm } from '../lib/alarmSound';
 import { useDaystead } from './context';
 import ScheduleForm from './ScheduleForm';
+import SetupGuide from './SetupGuide';
 
 // Same tabs, order and icons as NAV_TABS in mobile/App.tsx.
 const TABS = [
@@ -19,7 +20,7 @@ const TABS = [
 const ADD_KINDS: [Kind, string, typeof Sun][] = [['bill', 'Bill', FileText], ['medicine', 'Medicine', PlusSquare], ['appointment', 'Appointment', Calendar], ['todo', 'To-do', CheckSquare]];
 
 export default function AppShell() {
-  const { setEditor, error, editor } = useDaystead();
+  const { setEditor, error, editor, setupOpen } = useDaystead();
   const { pathname } = useLocation();
   const [chooser, setChooser] = useState(false);
   const tab = pathname.split('/')[2] || 'today';
@@ -55,15 +56,15 @@ export default function AppShell() {
           </div>
           <PriorityAlerts />
           {error && !editor && <p role="alert" className="bg-[#FDF0EE] border border-[#E8B4AC] text-[var(--ds-missed)] rounded-xl px-4 py-3 text-sm">{error}</p>}
-          <Outlet />
+          {setupOpen ? <SetupGuide /> : <Outlet />}
           <p className="text-center text-xs text-[var(--ds-muted)] mt-2">Your day, in order.</p>
         </div>
       </main>
 
-      <button onClick={add} aria-label={tab === 'bills' ? 'Add a bill' : tab === 'medicines' ? 'Add a medicine' : 'Add something'}
+      {!setupOpen && <button onClick={add} aria-label={tab === 'bills' ? 'Add a bill' : tab === 'medicines' ? 'Add a medicine' : 'Add something'}
         className="fixed right-5 bottom-24 md:bottom-8 md:right-8 z-30 w-[58px] h-[58px] rounded-full bg-[var(--ds-accent)] text-white flex items-center justify-center shadow-lg hover:opacity-90">
         <Plus size={28} />
-      </button>
+      </button>}
 
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-20 bg-white border-t border-[var(--ds-line)] flex py-3">
         {TABS.map(({ to, label, icon: Icon, end }) => (
