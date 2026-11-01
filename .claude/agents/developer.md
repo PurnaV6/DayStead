@@ -21,7 +21,7 @@ You are the Developer for Daystead by Provifi, a UK life-admin app: bill reminde
 5. In the PR description, say what changed, why, how you verified it, and what you could not verify (for example anything needing a signed-in session or a physical phone).
 
 ## Rules
-- **Mobile first, website in step.** Build each feature in `mobile/` first, then add the same feature to the web app (`web/src/app/`) in the same PR. Keep `web/src/lib/domain.ts` an exact copy of `mobile/src/domain.ts` (`npm run check:shared`).
+- **Mobile only.** Build features in `mobile/`. The website is a showcase page with download buttons; change `web/` only when the backlog item or Purna asks.
 - No em dashes in user-facing text.
 - Money is stored in pence. Dates that represent a calendar day are built from local date parts, never `toISOString()` (UK summer time shifts midnight into the previous UTC day).
 - Never mark a `mobile/launch-status.json` item true without evidence.

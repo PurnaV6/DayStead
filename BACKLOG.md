@@ -10,16 +10,17 @@ The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION
 - [ ] **Later:** Apple Developer ($99/year) once Android has its first paying users; UK trademark for DayStead (class 9, £170) before any marketing spend. [blocked: owner]
 
 ## Next up (agents)
-Every app feature is built in the phone app and on the website in the same PR. Website-only or document items say so.
+Mobile only. The website is a showcase page; it changes only when an item says so.
 
 1. [ ] **Missed items from earlier months.** Today's "Needs your attention" only looks back to the 1st of this month, so a bill missed in late October disappears on 1 November. Look back 35 days.
-2. [ ] **Simple showcase page on the website.** The signed-out home page explains DayStead in one screen: what it does, the price (1 month free, then £3.99/month or £35.99/year), three screenshots, a "Get it on Google Play" button (shown as "Coming soon" until the listing is live), and Sign in. Website only; keep it to one page.
+2. [ ] **Showcase website, no web app** (website only). Replace the website's sign-in and signed-in web app with one showcase page: what DayStead does, the price (1 month free, then £3.99/month or £35.99/year), three screenshots, and "Get it on Google Play" and "Download on the App Store" buttons (both shown as "Coming soon" until each listing is live). Remove `web/src/app/` and its routes. Keep `/privacy`, `/terms`, `/support`, `/delete-account` and `/verified`.
 3. [ ] **Google Play listing and Android release build** (CEO, designer, developer). Play Store title, short and full description, screenshots plan and data safety answers in `release/store-listing.md` (no medical claims), and an EAS Android production build profile. Android first; Apple later.
-4. [ ] **Free launch plan for carers** (CEO and CFO). Free promotion only: carers groups, carers centres, Reddit and the survey testers, plus a partnership outreach list for carers centres and councils, with the cost per paying user each approach would need to beat, saved in `research/`.
-5. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
-6. [ ] **Accessibility pass on mobile.** Screen-reader labels on every icon and button, checked with large text, 44pt touch targets, and AA contrast.
-7. [ ] **Reminder tests.** Unit tests for `reconcileReminders` limits: at most 48 alerts plus 12 missed follow-ups plus the trial notice, staying under iOS's limit of 64 pending notifications.
-8. [ ] **Friendly offline and error states.** Show clear messages when Supabase can't be reached, instead of raw error text.
+4. [ ] **Subscription required to use the app.** After sign-up the app shows "Start your free month". Google Play (later Apple) asks for the card, checks it, and charges automatically after the free month unless cancelled; DayStead never handles card details. Without an active trial or subscription the app shows only the paywall, Restore purchase, Sign out, Export my data and Delete account; records stay saved and come back on subscribing. Only switches on when billing is enabled, so testing stays open. Add `supabase/require-subscription.sql` (row-level security: read and write records only with an active trial or subscription) for Purna to run at launch.
+5. [ ] **Free launch plan for carers** (CEO and CFO). Free promotion only: carers groups, carers centres, Reddit and the survey testers, plus a partnership outreach list for carers centres and councils, with the cost per paying user each approach would need to beat, saved in `research/`.
+6. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
+7. [ ] **Accessibility pass on mobile.** Screen-reader labels on every icon and button, checked with large text, 44pt touch targets, and AA contrast.
+8. [ ] **Reminder tests.** Unit tests for `reconcileReminders` limits: at most 48 alerts plus 12 missed follow-ups plus the trial notice, staying under iOS's limit of 64 pending notifications.
+9. [ ] **Friendly offline and error states.** Show clear messages when Supabase can't be reached, instead of raw error text.
 
 ## Done
 - Owner ran `supabase/for-person.sql` and added the website redirect URL in Supabase.

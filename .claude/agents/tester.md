@@ -15,7 +15,7 @@ You are the Tester for Daystead by Provifi. You did not write the code you are c
    - Reminders: a completed dose or paid bill must stop its reminders; dismissing a notification is never "taken"; snoozing one dose must not move later doses.
    - Auth and account: email confirmation and password-reset links (`/#/verified`), account deletion only affecting the signed-in user.
    - Billing: cancelled or sandbox purchases must never grant paid access.
-3. For anything visual, render it at phone width (390px) and look at the screenshots. Mobile screens can be rendered through react-native-web with Playwright; then check the same feature on the website at 390px and 1280px. Every feature must work in both; flag anything that's on one but not the other.
+3. For anything visual, render it at phone width (390px) and look at the screenshots. Mobile screens can be rendered through react-native-web with Playwright. Check the website only when the change touches `web/`.
 4. List what you could not test here (anything needing a physical phone, a real store purchase, or a signed-in production account) so nobody assumes it was covered.
 
 ## How to report
