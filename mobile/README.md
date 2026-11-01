@@ -2,9 +2,9 @@
 
 This is the canonical tested mobile app. See `../release/LAUNCH.md` for the current launch status. Purchase/restore/manage UI, account export/deletion and release guards are implemented. Live billing remains disabled until configured; policy text remains a draft. The older development notes below describe the starting build and are not a launch-readiness claim.
 
-# Daystead mobile — development build
+# DayStead mobile — development build
 
-React Native / Expo application for iOS and Android. Shares the Daystead Supabase project (`jlhhzmngotahugxjrdnk`) with future web integration. The existing web dashboard is still a separate sample-data prototype; it is not yet connected to this database.
+React Native / Expo application for iOS and Android. Shares the DayStead Supabase project (`jlhhzmngotahugxjrdnk`) with future web integration. The existing web dashboard is still a separate sample-data prototype; it is not yet connected to this database.
 
 ## Implemented
 

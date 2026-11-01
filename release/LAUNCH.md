@@ -1,4 +1,4 @@
-# Daystead launch preparation
+# DayStead launch preparation
 
 ## Canonical source
 

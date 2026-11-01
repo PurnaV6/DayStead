@@ -1,4 +1,4 @@
-# Daystead by Provifi
+# DayStead by Provifi
 
 Your day, in order. A UK app that puts bill reminders with "money needed before payday", medication reminders and appointments in one place. 1 month free, then £3.99/month or £35.99/year.
 

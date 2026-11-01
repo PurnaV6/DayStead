@@ -63,7 +63,7 @@ export default function SetupGuide() {
       {step === 0 && (
         <>
           <h1 ref={heading} tabIndex={-1} className="text-[30px] font-bold tracking-tight text-[var(--ds-ink)] outline-none">When are you next paid?</h1>
-          <p className="text-[15px] leading-6">Daystead adds up the bills due before then, so you know how much to keep aside.</p>
+          <p className="text-[15px] leading-6">DayStead adds up the bills due before then, so you know how much to keep aside.</p>
           <label className="flex flex-col gap-2">
             <span className="text-[13px] font-semibold">Your next payday</span>
             <input type="date" min={ymd(today)} max={ymd(maxDay)} value={payday} onChange={(e) => setPayday(e.target.value)}
@@ -103,8 +103,8 @@ export default function SetupGuide() {
       {step === 2 && (
         <>
           <h1 ref={heading} tabIndex={-1} className="text-[30px] font-bold tracking-tight text-[var(--ds-ink)] outline-none">Turn on reminders</h1>
-          <p className="text-[15px] leading-6">Reminders come from the Daystead phone app: 3 days before a bill is due, and at each medicine time you set.</p>
-          <p className="text-[15px] leading-6">Sign in to the app with this same account, then turn them on in Account. Reminders say “Daystead reminder”, so your lock screen never shows what a bill or medicine is.</p>
+          <p className="text-[15px] leading-6">Reminders come from the DayStead phone app: 3 days before a bill is due, and at each medicine time you set.</p>
+          <p className="text-[15px] leading-6">Sign in to the app with this same account, then turn them on in Account. Reminders say “DayStead reminder”, so your lock screen never shows what a bill or medicine is.</p>
           <p className="text-[15px] leading-6">While this website is open, it also shows urgent items at the top of the page.</p>
           <Primary onClick={closeSetup}>Finish</Primary>
         </>

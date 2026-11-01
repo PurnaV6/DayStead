@@ -1,4 +1,4 @@
--- Deploy on the existing Daystead project, not the legacy root schema.
+-- Deploy on the existing DayStead project, not the legacy root schema.
 -- Only trusted backend code may call this function. Duplicate events re-fetch current
 -- RevenueCat state; older concurrent observations cannot replace newer ones.
 create or replace function public.apply_daystead_subscription(p_user_id uuid,p_status text,p_until timestamptz,p_observed_at timestamptz)

@@ -1,4 +1,4 @@
-# Daystead backlog
+# DayStead backlog
 
 The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION.md`) takes the top unblocked item. Mobile app first.
 

@@ -26,7 +26,7 @@ export default function VerifiedPage() {
             <h1 className="text-2xl font-extrabold mt-6">This link didn't work</h1>
             <p className="text-[var(--ds-muted)] mt-3">{error}</p>
             <p className="text-[var(--ds-muted)] mt-3">
-              Links expire after a while. Open the Daystead app and request a new one.
+              Links expire after a while. Open the DayStead app and request a new one.
             </p>
           </>
         ) : isRecovery ? (
@@ -36,7 +36,7 @@ export default function VerifiedPage() {
             <CheckCircle2 size={40} className="mx-auto mt-6 text-[var(--ds-accent)]" />
             <h1 className="text-2xl font-extrabold mt-4">You're verified</h1>
             <p className="text-[var(--ds-muted)] mt-3">
-              Go back to the Daystead app on your phone and sign in with your email and password.
+              Go back to the DayStead app on your phone and sign in with your email and password.
             </p>
           </>
         )}
@@ -79,7 +79,7 @@ function ResetPassword({ accessToken }: { accessToken: string }) {
       <>
         <CheckCircle2 size={40} className="mx-auto mt-6 text-[var(--ds-accent)]" />
         <h1 className="text-2xl font-extrabold mt-4">Password updated</h1>
-        <p className="text-[var(--ds-muted)] mt-3">Go back to the Daystead app and sign in with your new password.</p>
+        <p className="text-[var(--ds-muted)] mt-3">Go back to the DayStead app and sign in with your new password.</p>
       </>
     );
   }

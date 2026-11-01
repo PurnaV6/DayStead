@@ -202,7 +202,7 @@ export function MedicinesPage() {
       <Heading>Your medicines</Heading>
       {!meds.length && <Small>No medicines yet. Tap + to add one.</Small>}
       {meds.map((o) => <ScheduleCard key={o.id} item={o} confirmText="Remove medicine schedule? This also removes its recorded history." />)}
-      <Small>Enter the instructions you were prescribed. Taken and skipped are your own reports. Daystead does not recommend doses.</Small>
+      <Small>Enter the instructions you were prescribed. Taken and skipped are your own reports. DayStead does not recommend doses.</Small>
     </>
   );
 }
@@ -259,10 +259,10 @@ export function AccountPage() {
       </Card>
       <Card>
         <Heading>Reminders</Heading>
-        <p className="text-[var(--ds-muted)]">Phone reminders and alarm-style medicine alerts are set in the Daystead phone app. While this page is open, the website also shows urgent items at the top and beeps when one becomes due.</p>
+        <p className="text-[var(--ds-muted)]">Phone reminders and alarm-style medicine alerts are set in the DayStead phone app. While this page is open, the website also shows urgent items at the top and beeps when one becomes due.</p>
       </Card>
       <Card>
-        <Heading>Daystead Premium</Heading>
+        <Heading>DayStead Premium</Heading>
         <p>1 month free for new subscribers, then £3.99 a month or £35.99 a year (save 25%).</p>
         <Small>Subscriptions are bought, restored and cancelled in the phone app through Apple or Google. Deleting your account does not cancel store billing.</Small>
       </Card>

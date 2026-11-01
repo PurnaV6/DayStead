@@ -7,7 +7,7 @@ Notifications.setNotificationHandler({handleNotification:async()=>({shouldShowBa
 export async function enableReminders(){
  // AndroidImportance is a runtime enum re-exported by Expo 58; import/namespace misses that .types export.
  // eslint-disable-next-line import/namespace
- if(Platform.OS==='android')await Notifications.setNotificationChannelAsync('daystead',{name:'Daystead reminders',importance:Notifications.AndroidImportance.HIGH,sound:'default'});
+ if(Platform.OS==='android')await Notifications.setNotificationChannelAsync('daystead',{name:'DayStead reminders',importance:Notifications.AndroidImportance.HIGH,sound:'default'});
  const permission=await Notifications.requestPermissionsAsync();
  return permission.granted;
 }
@@ -22,7 +22,7 @@ async function scheduleTrialWarning(){
  const at=trial.endsAt-TRIAL_NOTICE_DAYS*86400000;
  if(at<=Date.now()+60000||!(await Notifications.getPermissionsAsync()).granted)return;
  const day=new Date(trial.endsAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
- await Notifications.scheduleNotificationAsync({identifier:TRIAL_ID,content:{title:'Your free month ends soon',body:`Your Daystead trial ends on ${day}. You'll be charged ${trial.price} then unless you cancel before it ends. If you've already cancelled, you won't be charged.`,sound:'default'},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:new Date(at),channelId:'daystead'}});
+ await Notifications.scheduleNotificationAsync({identifier:TRIAL_ID,content:{title:'Your free month ends soon',body:`Your DayStead trial ends on ${day}. You'll be charged ${trial.price} then unless you cancel before it ends. If you've already cancelled, you won't be charged.`,sound:'default'},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:new Date(at),channelId:'daystead'}});
 }
 // Pass null when there is no trial that will turn into a charge (not trialling, or already cancelled).
 export function setTrialWarning(next:{endsAt:Date;price:string}|null){
@@ -51,14 +51,14 @@ export function reconcileReminders(items:Occurrence[], enabled:boolean){
   const alerts=plannedAlerts(items,new Date()).filter(a=>!(a.minutes===0&&nativeKeys.has(a.occurrence.key))).slice(0,48);
   for(const alert of alerts)await Notifications.scheduleNotificationAsync({
    identifier:alert.occurrence.key+'|'+alert.minutes,
-   content:{title:'Daystead reminder',body:'You have a scheduled item. Open Daystead to review it.',sound:'default',data:{scheduleId:alert.occurrence.schedule.id,occurrenceAt:alert.occurrence.at.toISOString()}},
+   content:{title:'DayStead reminder',body:'You have a scheduled item. Open DayStead to review it.',sound:'default',data:{scheduleId:alert.occurrence.schedule.id,occurrenceAt:alert.occurrence.at.toISOString()}},
    trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:alert.at,channelId:'daystead'}
   });
   // One red follow-up if a bill or dose is still unmarked. Wording stays generic, like the other reminders, so the lock screen does not reveal bills or medicines. Capped so the total stays under iOS's 64 pending notifications.
   // The red accent shows on Android; iOS does not allow coloured notifications.
   for(const follow of missedFollowUps(items,new Date()).slice(0,12))await Notifications.scheduleNotificationAsync({
    identifier:follow.occurrence.key+'|missed',
-   content:{title:'Missed: Daystead reminder',body:'Something due earlier has not been marked as done. Open Daystead to review it.',sound:'default',color:'#B3261E',data:{scheduleId:follow.occurrence.schedule.id,occurrenceAt:follow.occurrence.at.toISOString()}},
+   content:{title:'Missed: DayStead reminder',body:'Something due earlier has not been marked as done. Open DayStead to review it.',sound:'default',color:'#B3261E',data:{scheduleId:follow.occurrence.schedule.id,occurrenceAt:follow.occurrence.at.toISOString()}},
    trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:follow.at,channelId:'daystead'}
   });
   return {count:alerts.length,through:alerts.at(-1)?.at??null,alarmNote};
@@ -67,5 +67,5 @@ export function reconcileReminders(items:Occurrence[], enabled:boolean){
 }
 export async function snooze(item:Occurrence){
  if(!(await Notifications.getPermissionsAsync()).granted)throw new Error('Allow phone notifications before snoozing.');
- await Notifications.scheduleNotificationAsync({content:{title:'Daystead reminder',body:'Your snoozed item is ready to review.',sound:'default',data:{scheduleId:item.schedule.id}},trigger:{type:Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,seconds:300,channelId:'daystead'}});
+ await Notifications.scheduleNotificationAsync({content:{title:'DayStead reminder',body:'Your snoozed item is ready to review.',sound:'default',data:{scheduleId:item.schedule.id}},trigger:{type:Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,seconds:300,channelId:'daystead'}});
 }
