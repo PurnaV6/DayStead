@@ -6,7 +6,7 @@ The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION
 - [ ] Merge PR #9 (red marking for missed items; month comparison chart on the Dashboard) after checking it in Expo Go. [blocked: owner]
 - [ ] Run `supabase/for-person.sql` in the Supabase SQL editor so "Who is this for?" saves. [blocked: owner]
 - [ ] Supabase: add `https://web-mwdx.vercel.app/**` to Authentication > URL Configuration > Redirect URLs. [blocked: owner]
-- [ ] Supabase: turn on leaked-password protection. [blocked: owner]
+- [ ] Supabase: turn on leaked-password protection at launch, when the project moves to Supabase Pro (it is a Pro-only feature). Until then, require lowercase, uppercase and digits under Authentication > Sign In / Providers > Email. [blocked: owner]
 - [ ] Export the live schema into the repo (`supabase db dump --schema public > supabase/schema.sql`) so row-level security can be reviewed. [blocked: owner]
 - [ ] Apple and Google developer accounts, a RevenueCat project, the 1-month free trial offers, and a real support email. [blocked: owner]
 
