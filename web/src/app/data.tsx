@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { occurrences, monthBills, type Completion, type Schedule } from '../lib/domain';
@@ -15,6 +16,11 @@ export function DaysteadProvider({ session, children }: { session: Session; chil
   const [error, setError] = useState('');
   const [editor, setEditor] = useState<Editor>(null);
   const [clock, setClock] = useState(() => Date.now());
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [setupKnown, setSetupKnown] = useState<string[]>([]);
+  const setupChecked = useRef(false);
+  const navigate = useNavigate();
+  const setupKey = 'daystead:setup:' + userId;
 
   const load = useCallback(async () => {
     const [a, b] = await Promise.all([
@@ -24,7 +30,14 @@ export function DaysteadProvider({ session, children }: { session: Session; chil
     if (a.error || b.error) throw a.error || b.error;
     setSchedules(a.data || []);
     setDone(b.data || []);
-  }, [userId]);
+    // Show the setup guide once per browser to a new account: first load done and nothing added yet.
+    if (!setupChecked.current) {
+      setupChecked.current = true;
+      let seen = false;
+      try { seen = localStorage.getItem(setupKey) === 'done'; } catch { /* storage blocked: show it */ }
+      if (!a.data?.length && !seen) { setSetupKnown([]); setSetupOpen(true); }
+    }
+  }, [userId, setupKey]);
 
   const run = useCallback(async (task: () => Promise<void>) => {
     setBusy(true);
@@ -77,6 +90,14 @@ export function DaysteadProvider({ session, children }: { session: Session; chil
     remaining,
     editor,
     setEditor,
+    setupOpen,
+    setupKnown,
+    openSetup: () => { setSetupKnown(schedules.map((o) => o.id)); setSetupOpen(true); },
+    closeSetup: () => {
+      try { localStorage.setItem(setupKey, 'done'); } catch { /* storage blocked */ }
+      setSetupOpen(false);
+      navigate('/app');
+    },
     refresh: () => run(load),
     complete: (o, status) =>
       run(async () => {

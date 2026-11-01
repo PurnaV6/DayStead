@@ -22,6 +22,11 @@ export interface Daystead {
   complete: (o: Occurrence, status: string) => Promise<void>;
   remove: (item: Schedule) => Promise<void>;
   save: (values: Partial<Schedule>) => Promise<void>;
+  // First-run setup guide (same as mobile/src/SetupGuide.tsx).
+  setupOpen: boolean;
+  setupKnown: string[];
+  openSetup: () => void;
+  closeSetup: () => void;
 }
 
 export const Ctx = createContext<Daystead | null>(null);

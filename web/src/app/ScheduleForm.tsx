@@ -3,11 +3,10 @@ import { X } from 'lucide-react';
 import { formatDoseTime, type Schedule } from '../lib/domain';
 import { useDaystead } from './context';
 import { Button, Small } from './ui';
+import { BILL_TEMPLATES } from './templates';
 
 // Web version of ScheduleForm in mobile/App.tsx. Same fields, checks and saved payload.
 
-// Common UK household bills for one-tap setup. Keep in sync with BILL_TEMPLATES in mobile/App.tsx.
-const BILL_TEMPLATES: [string, string][] = [['Rent', 'Rent'], ['Mortgage', 'Mortgage'], ['Council tax', 'Council tax'], ['Energy', 'Utilities'], ['Water', 'Utilities'], ['Broadband', 'Utilities'], ['Mobile phone', 'Subscriptions'], ['TV licence', 'Subscriptions'], ['Car insurance', 'Car insurance'], ['Credit card', 'Credit card'], ['Streaming', 'Subscriptions']];
 
 const input = 'w-full border border-[var(--ds-line)] rounded-xl p-3.5 text-base bg-[#FCFCF8] text-[var(--ds-ink)] outline-none focus:border-[var(--ds-accent)]';
 const pad = (n: number) => String(n).padStart(2, '0');
