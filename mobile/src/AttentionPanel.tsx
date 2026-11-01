@@ -3,7 +3,7 @@ import {Alert,Platform,Pressable,View} from 'react-native';
 import {Text} from './Text';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {supabase} from './supabase';
-import {isMissed,occurrences,pounds} from './domain';
+import {attentionStart,isMissed,occurrences,pounds} from './domain';
 import type {Schedule,Completion,Occurrence} from './domain';
 export function AttentionPanel({userId,schedules,done,now,onComplete,busy}:{userId:string;schedules:Schedule[];done:Completion[];now:Date;onComplete:(o:Occurrence,status:string)=>Promise<void>;busy:boolean}){
  const [dismissed,setDismissed]=useState<string[]>([]),[payday,setPayday]=useState(''),[savedPayday,setSavedPayday]=useState(''),[ready,setReady]=useState(false),[saving,setSaving]=useState(false),[all,setAll]=useState(false),[undo,setUndo]=useState<string|null>(null),[picking,setPicking]=useState(false);
@@ -14,7 +14,8 @@ export function AttentionPanel({userId,schedules,done,now,onComplete,busy}:{user
  useEffect(()=>{let active=true;supabase.from('daystead_preferences').select('*').eq('user_id',userId).maybeSingle().then(({data,error})=>{if(!active)return;if(error){Alert.alert('Preferences unavailable',error.message);return}setDismissed(data?.dismissed||[]);setPayday(data?.payday||'');setSavedPayday(data?.payday||'');setReady(true)});return()=>{active=false}},[userId]);
  async function persist(keys:string[],date:string){setSaving(true);try{const {error}=await supabase.from('daystead_preferences').upsert({user_id:userId,dismissed:keys.slice(-500),payday:date||null});if(error)throw error;setDismissed(keys.slice(-500));setSavedPayday(date);return true}catch(e){Alert.alert('Could not save',(e as Error).message);return false}finally{setSaving(false)}}
  const start=new Date(now.getFullYear(),now.getMonth(),1),end=new Date(+now+3*86400000);
- const items=occurrences(schedules,start,end,done).filter(o=>!o.status);
+ // Unpaid bills from the last 35 days stay here, so a bill missed late last month is not lost on the 1st.
+ const items=occurrences(schedules,attentionStart(now),end,done).filter(o=>!o.status);
  const today=items.filter(o=>o.at.toDateString()===now.toDateString());
  const attention=items.filter(o=>!dismissed.includes(o.key)&&(o.schedule.kind==='bill'||o.at.toDateString()===now.toDateString())).sort((a,b)=>Number(isMissed(b,now))-Number(isMissed(a,now))||Number(!!b.schedule.priority)-Number(!!a.schedule.priority)||+a.at-+b.at);
  const missedCount=attention.filter(o=>isMissed(o,now)).length;

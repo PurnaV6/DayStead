@@ -69,6 +69,12 @@ export function isMissed(o:Occurrence, now:Date){
  if(o.schedule.kind==='medicine')return +o.at<=+now-MISSED_DOSE_MINUTES*60000;
  return false;
 }
+// "Needs your attention" looks back this many days, so a bill missed late last month
+// does not disappear on the 1st. Built from local date parts so clock changes cannot shift it.
+export const ATTENTION_LOOKBACK_DAYS=35;
+export function attentionStart(now:Date){
+ return new Date(now.getFullYear(),now.getMonth(),now.getDate()-ATTENTION_LOOKBACK_DAYS);
+}
 // One follow-up reminder per item if it is still unrecorded: 9am the day after a bill's due date,
 // or 30 minutes after a dose. Cancelled with everything else when the item is marked.
 export function missedFollowUps(items:Occurrence[], now:Date){
