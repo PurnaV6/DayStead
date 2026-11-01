@@ -1,5 +1,6 @@
 import React,{useState} from 'react';
-import {Alert,Linking,Modal,Pressable,ScrollView,Share,Text,TextInput,View} from 'react-native';
+import {Alert,Linking,Modal,Pressable,ScrollView,Share,View} from 'react-native';
+import {Text,TextInput} from './Text';
 import {SafeAreaProvider,SafeAreaView} from 'react-native-safe-area-context';
 import {supabase} from './supabase';
 import {reconcileReminders} from './notifications';

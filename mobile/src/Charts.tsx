@@ -1,5 +1,6 @@
 import React from 'react';
-import {View,Text} from 'react-native';
+import {View} from 'react-native';
+import {Text} from './Text';
 import Svg,{Circle,Polyline,Line} from 'react-native-svg';
 import {Occurrence,pounds} from './domain';
 const palette=['#2D6554','#9CBCA6','#D4A864','#809EB7','#AD91B9','#D0CCC2'];

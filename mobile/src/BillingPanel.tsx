@@ -1,5 +1,6 @@
 import React,{useEffect,useState} from 'react';
-import {AppState,Linking,Pressable,Text,View} from 'react-native';
+import {AppState,Linking,Pressable,View} from 'react-native';
+import {Text} from './Text';
 import type {CustomerInfo,PurchasesPackage} from 'react-native-purchases';
 import {billingConfigured,connectBilling,freeTrialLabel,iosTrialEligibility,priceForEntitlement,getBillingInfo,hasPremium,premiumId,purchasePlan,restorePurchases,watchBilling} from './billing';
 import {setTrialWarning} from './notifications';
