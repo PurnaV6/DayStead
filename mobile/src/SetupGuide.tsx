@@ -40,7 +40,7 @@ export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onT
     <Text style={g.title} accessibilityRole="header">When are you next paid?</Text>
     <Text style={g.text}>Daystead adds up the bills due before then, so you know how much to keep aside.</Text>
     {Platform.OS!=='ios'&&<Pressable accessibilityRole="button" accessibilityLabel={payday?'Payday '+paydayLabel+'. Change':'Choose your next payday'} onPress={()=>setPicking(true)} style={g.field}><Text style={{color:C.ink,fontSize:15}}>{payday?paydayLabel:'Choose your next payday'}</Text><Text style={g.link}>{payday?'Change':'Choose'}</Text></Pressable>}
-    {picking&&<DateTimePicker value={payday?new Date(payday+'T12:00:00'):new Date(+todayStart+86400000)} mode="date" display={Platform.OS==='ios'?'inline':'calendar'} minimumDate={todayStart} maximumDate={new Date(+todayStart+366*86400000)} accentColor={C.green} onChange={(event,selected)=>{if(Platform.OS==='android')setPicking(false);if(event.type==='dismissed'||!selected)return;setPayday(ymd(selected))}}/>}
+    {picking&&<DateTimePicker value={payday?new Date(payday+'T12:00:00'):new Date(now.getFullYear(),now.getMonth(),now.getDate()+1)} mode="date" display={Platform.OS==='ios'?'inline':'calendar'} minimumDate={todayStart} maximumDate={new Date(+todayStart+366*86400000)} accentColor={C.green} onChange={(event,selected)=>{if(Platform.OS==='android')setPicking(false);if(event.type==='dismissed'||!selected)return;setPayday(ymd(selected))}}/>}
     {Platform.OS==='ios'&&!!payday&&<Text style={g.text}>Payday: {paydayLabel}</Text>}
     <Primary title={saving?'Saving…':'Save and continue'} disabled={!payday||saving} onPress={()=>void savePayday()}/>
    </>}
