@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Daystead",
+    "name": "DayStead",
     "slug": "daystead",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,7 +11,7 @@
       "bundleIdentifier": "com.provifi.daystead",
       "buildNumber": "1",
       "infoPlist": {
-        "NSAlarmKitUsageDescription": "Daystead sounds alarms for medicine schedules you explicitly set to Alarm mode."
+        "NSAlarmKitUsageDescription": "DayStead sounds alarms for medicine schedules you explicitly set to Alarm mode."
       }
     },
     "android": {

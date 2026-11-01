@@ -52,7 +52,7 @@ export default function SignInPage() {
     <div className="min-h-screen flex bg-[var(--ds-paper)]">
       <div className="hidden md:flex md:w-1/2 flex-col justify-center px-16 py-12 bg-[#EDF2E9]">
         <p className="text-[10px] font-bold tracking-[.18em] text-[var(--ds-muted)]">PROVIFI PRESENTS</p>
-        <p className="text-[43px] font-bold tracking-tighter text-[var(--ds-ink)]">daystead.</p>
+        <p className="text-[43px] font-bold tracking-tighter text-[var(--ds-ink)]">DayStead.</p>
         <h1 className="text-5xl font-semibold leading-tight tracking-tight mt-8 text-[var(--ds-ink)]">A little order.<br />A lighter day.</h1>
         <p className="mt-6 text-lg text-[var(--ds-muted)] max-w-sm">Your bills, medicines and appointments. One calm place to stay on top of life.</p>
         <div className="mt-10 divide-y divide-[var(--ds-line)]">
@@ -64,9 +64,9 @@ export default function SignInPage() {
 
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <form onSubmit={submit} className="w-full max-w-md bg-white border border-[var(--ds-line)] rounded-[22px] p-6 flex flex-col gap-4">
-          <p className="md:hidden text-[34px] font-bold tracking-tighter text-[var(--ds-ink)]">daystead.</p>
+          <p className="md:hidden text-[34px] font-bold tracking-tighter text-[var(--ds-ink)]">DayStead.</p>
           <h2 className="text-2xl font-semibold">{mode === 'signup' ? 'Make yourself at home' : 'Welcome back'}</h2>
-          <p className="text-sm text-[var(--ds-muted)] -mt-2">Use the same account as the Daystead phone app.</p>
+          <p className="text-sm text-[var(--ds-muted)] -mt-2">Use the same account as the DayStead phone app.</p>
           {mode === 'signup' && <label className="flex flex-col gap-1.5 text-sm font-semibold">Your name<input className={input} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" /></label>}
           <label className="flex flex-col gap-1.5 text-sm font-semibold">Email<input className={input} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" /></label>
           <label className="flex flex-col gap-1.5 text-sm font-semibold">Password<input className={input} type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} /></label>

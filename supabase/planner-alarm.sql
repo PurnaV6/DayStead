@@ -1,4 +1,4 @@
--- Applied to Daystead as daystead_planner_preferences and daystead_alarm_mode.
+-- Applied to DayStead as daystead_planner_preferences and daystead_alarm_mode.
 -- Run once when provisioning another environment; no data is removed.
 alter table public.daystead_schedules drop constraint daystead_schedules_kind_check;
 alter table public.daystead_schedules add constraint daystead_schedules_kind_check check (kind in ('bill','medicine','appointment','todo'));

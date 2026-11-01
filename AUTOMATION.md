@@ -1,6 +1,6 @@
-# Daystead agent team: automation cycle
+# DayStead agent team: automation cycle
 
-A scheduled task wakes the Daystead team session twice a day. Each run is one **cycle**. The five agents live in `.claude/agents/`: `ceo`, `cfo`, `designer`, `developer` and `tester`.
+A scheduled task wakes the DayStead team session twice a day. Each run is one **cycle**. The five agents live in `.claude/agents/`: `ceo`, `cfo`, `designer`, `developer` and `tester`.
 
 ## One cycle
 1. **Check what's waiting.** Look at open pull requests on PurnaV6/DayStead.
@@ -26,4 +26,4 @@ A scheduled task wakes the Daystead team session twice a day. Each run is one **
 - Follow the rules in `HANDOFF.md`: no em dashes, money in pence, local calendar dates, no secrets in the repo.
 
 ## Stopping or changing it
-The owner can say "pause the automation", "run a cycle now" or "change it to once a day" in the team session or in any chat. All of these change the scheduled task named "Daystead agent team cycle".
+The owner can say "pause the automation", "run a cycle now" or "change it to once a day" in the team session or in any chat. All of these change the scheduled task named "DayStead agent team cycle".

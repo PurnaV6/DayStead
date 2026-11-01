@@ -1,8 +1,8 @@
-# Daystead: start-here brief for a new chat
+# DayStead: start-here brief for a new chat
 
 Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 
-**What it is.** Daystead by Provifi ("Your day, in order.") is a UK subscription app that puts bill reminders with "money needed before payday", medication reminders (including alarm-style alerts) and appointments/to-dos in one place. Owner: Purna Vemula.
+**What it is.** DayStead by Provifi ("Your day, in order.") is a UK subscription app that puts bill reminders with "money needed before payday", medication reminders (including alarm-style alerts) and appointments/to-dos in one place. Owner: Purna Vemula.
 
 **Mobile first, website kept in step.** The phone app in `mobile/` is the product. Every feature is built there first and then added to the website in the same PR. The website (`web/`, https://web-mwdx.vercel.app) is the signed-in web version: same Supabase account and data, the same 6 tabs, the + button, the charts and the red missed items. Phone-only features (notifications, alarms, store purchases) get a note on the web instead. `web/src/lib/domain.ts` is an exact copy of `mobile/src/domain.ts` (`cd web && npm run check:shared`).
 

@@ -38,7 +38,7 @@ export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onT
   <ScrollView contentContainerStyle={g.body}>
    {step===0&&<>
     <Text style={g.title} accessibilityRole="header">When are you next paid?</Text>
-    <Text style={g.text}>Daystead adds up the bills due before then, so you know how much to keep aside.</Text>
+    <Text style={g.text}>DayStead adds up the bills due before then, so you know how much to keep aside.</Text>
     {Platform.OS!=='ios'&&<Pressable accessibilityRole="button" accessibilityLabel={payday?'Payday '+paydayLabel+'. Change':'Choose your next payday'} onPress={()=>setPicking(true)} style={g.field}><Text style={{color:C.ink,fontSize:15}}>{payday?paydayLabel:'Choose your next payday'}</Text><Text style={g.link}>{payday?'Change':'Choose'}</Text></Pressable>}
     {picking&&<DateTimePicker value={payday?new Date(payday+'T12:00:00'):new Date(now.getFullYear(),now.getMonth(),now.getDate()+1)} mode="date" display={Platform.OS==='ios'?'inline':'calendar'} minimumDate={todayStart} maximumDate={new Date(+todayStart+366*86400000)} accentColor={C.green} onChange={(event,selected)=>{if(Platform.OS==='android')setPicking(false);if(event.type==='dismissed'||!selected)return;setPayday(ymd(selected))}}/>}
     {Platform.OS==='ios'&&!!payday&&<Text style={g.text}>Payday: {paydayLabel}</Text>}
@@ -55,7 +55,7 @@ export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onT
    {step===2&&<>
     <Text style={g.title} accessibilityRole="header">Turn on reminders</Text>
     <Text style={g.text}>We remind you 3 days before a bill is due, and at each medicine time you set.</Text>
-    <Text style={g.text}>Reminders say “Daystead reminder”, so your lock screen never shows what a bill or medicine is.</Text>
+    <Text style={g.text}>Reminders say “DayStead reminder”, so your lock screen never shows what a bill or medicine is.</Text>
     {remindersOn?<><View style={g.doneBox}><Text style={g.doneText}>✓ Reminders are on for this phone</Text></View><Primary title="Finish" onPress={onClose}/></>:<Primary title={asking?'Please wait…':'Turn on reminders'} disabled={asking} onPress={()=>void reminders()}/>}
    </>}
    <View style={g.footer}>

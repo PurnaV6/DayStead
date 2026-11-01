@@ -1,4 +1,4 @@
-# Daystead by Provifi — Product Spec (source of truth)
+# DayStead by Provifi — Product Spec (source of truth)
 
 Tagline: **Your day, in order.**
 
@@ -9,7 +9,7 @@ app's actual code as of this commit, not aspiration.
 
 ## 1. The application
 
-Daystead is a mobile life-admin app: see what needs doing, know how much money to
+DayStead is a mobile life-admin app: see what needs doing, know how much money to
 keep available, get reminders before things become overdue. Built for ordinary
 people managing everyday responsibilities — usable for all sections or only the
 ones relevant to a given user.

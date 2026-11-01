@@ -35,7 +35,7 @@ export default function AppShell() {
     <div className="min-h-screen bg-[var(--ds-paper)] md:flex">
       <aside className="hidden md:flex w-64 shrink-0 flex-col gap-8 p-6 border-r border-[var(--ds-line)] bg-white">
         <div>
-          <p className="text-[27px] font-bold tracking-tight text-[var(--ds-ink)]">daystead.</p>
+          <p className="text-[27px] font-bold tracking-tight text-[var(--ds-ink)]">DayStead.</p>
           <p className="text-[10px] font-bold tracking-[.18em] text-[var(--ds-muted)]">BY PROVIFI</p>
         </div>
         <nav className="flex flex-col gap-1">
@@ -45,13 +45,13 @@ export default function AppShell() {
             </NavLink>
           ))}
         </nav>
-        <p className="mt-auto text-xs text-[var(--ds-muted)]">Same account and data as the Daystead phone app.</p>
+        <p className="mt-auto text-xs text-[var(--ds-muted)]">Same account and data as the DayStead phone app.</p>
       </aside>
 
       <main className="flex-1 min-w-0">
         <div className="max-w-3xl mx-auto px-5 md:px-10 pt-6 pb-32 md:pb-16 flex flex-col gap-5">
           <div className="md:hidden flex items-center justify-between">
-            <p className="text-[27px] font-bold tracking-tight text-[var(--ds-ink)]">daystead.</p>
+            <p className="text-[27px] font-bold tracking-tight text-[var(--ds-ink)]">DayStead.</p>
             <span className="border border-[var(--ds-line)] rounded-full px-3 py-1 text-[11px] text-[var(--ds-muted)]">BY PROVIFI</span>
           </div>
           <PriorityAlerts />
