@@ -1,5 +1,6 @@
 import React,{useEffect,useRef,useState} from 'react';
-import {Alert,AppState,Linking,Modal,Platform,Pressable,RefreshControl,ScrollView,StyleSheet,Text,TextInput,View} from 'react-native';
+import {Alert,AppState,Linking,Modal,Platform,Pressable,RefreshControl,ScrollView,StyleSheet,View} from 'react-native';
+import {Text,TextInput,useBrandFont} from './src/Text';
 import {SafeAreaProvider,SafeAreaView} from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,7 +34,7 @@ function Button({title,onPress,secondary=false,disabled=false}:{title:string;onP
 function Field({label,...props}:React.ComponentProps<typeof TextInput>&{label:string}){return <View style={{gap:6}}><Text style={s.label}>{label}</Text><TextInput placeholderTextColor="#98A098" style={s.input} {...props}/></View>}
 const fail=(error:unknown)=>Alert.alert('Please try again',error instanceof Error?error.message:String((error as any)?.message||error));
 
-export default function App(){return <SafeAreaProvider><Daystead/></SafeAreaProvider>}
+export default function App(){const fontReady=useBrandFont();if(!fontReady)return null;return <SafeAreaProvider><Daystead/></SafeAreaProvider>}
 function Daystead(){
  const [session,setSession]=useState<Session|null>(null),[boot,setBoot]=useState(true),[busy,setBusy]=useState(false),[tab,setTab]=useState('Today');
  const [chooser,setChooser]=useState(false);

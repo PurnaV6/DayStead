@@ -1,5 +1,6 @@
 import React,{useEffect,useState} from 'react';
-import {Alert,BackHandler,Platform,Pressable,ScrollView,StyleSheet,Text,View} from 'react-native';
+import {Alert,BackHandler,Platform,Pressable,ScrollView,StyleSheet,View} from 'react-native';
+import {Text} from './Text';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {supabase} from './supabase';
 

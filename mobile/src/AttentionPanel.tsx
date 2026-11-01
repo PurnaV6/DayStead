@@ -1,5 +1,6 @@
 import React,{useEffect,useState} from 'react';
-import {Alert,Platform,Pressable,Text,View} from 'react-native';
+import {Alert,Platform,Pressable,View} from 'react-native';
+import {Text} from './Text';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {supabase} from './supabase';
 import {isMissed,occurrences,pounds} from './domain';

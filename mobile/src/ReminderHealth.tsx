@@ -1,5 +1,6 @@
 import React,{useState} from 'react';
-import {Alert,Linking,Pressable,Text,View} from 'react-native';
+import {Alert,Linking,Pressable,View} from 'react-native';
+import {Text} from './Text';
 import {alarmStatus,requestAlarmPermission} from './alarm';
 import * as Notifications from 'expo-notifications';
 export function ReminderHealth(){
