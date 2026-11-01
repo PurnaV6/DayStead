@@ -34,7 +34,7 @@ function Header() {
         </div>
       </div>
       <div className="max-w-[1320px] mx-auto px-5 md:px-8 h-[72px] flex items-center justify-between">
-        <Link to="/" className="text-[26px] font-bold tracking-[-0.04em]" aria-label="DayStead home">DayStead.</Link>
+        <Link to="/" className="flex items-center gap-2.5 text-[26px] font-bold tracking-[-0.04em]" aria-label="DayStead home"><img src="/logo-mark.png" alt="" width="32" height="31" />DayStead.</Link>
         <nav aria-label="Main" className="hidden md:flex items-center gap-8 text-[16px] font-medium">
           {links.slice(1).map(([to, label]) => (
             <NavLink key={to} to={to} className={({ isActive }) => `link-u py-1 ${isActive ? 'font-semibold' : ''}`}>{label}</NavLink>
