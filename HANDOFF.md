@@ -4,6 +4,8 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 
 **What it is.** Daystead by Provifi ("Your day, in order.") is a UK subscription app that puts bill reminders with "money needed before payday", medication reminders (including alarm-style alerts) and appointments/to-dos in one place. Owner: Purna Vemula.
 
+**Mobile first.** The phone app in `mobile/` is the product. Make every change there unless the owner names the website. The website is secondary.
+
 **Price (decided).** 1 month free for new subscribers, then £3.99/month or £35.99/year; no permanent free tier. Cancelling before the trial ends means no charge, and the app reminds users 3 days before. You keep about £2.83/month or £25.49/year per subscriber after VAT and the 15% store fee. Running costs are about £53/month once launched, so break-even is about 22 paying subscribers. Paid ads lose money at this price (about £75 to £370 per paying user against a lifetime value of about £34), so growth must come from partnerships, communities and App Store search.
 
 **Where everything is**
@@ -15,10 +17,16 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 
 **Market research** (`research/market-2026-10.md`): no verified app combines bills, meds and appointments; £3.99 is at or below comparable apps; launch with unpaid carers via councils and carers centres; paid ads won't pay back at this price; lead with the annual plan because monthly churn is the main revenue risk.
 
-**Team agents** (in `.claude/agents/`): `developer` (code changes via PR), `tester` (independent QA), `ceo` (strategy and priorities), `cfo` (pricing and unit economics).
+**Team agents** (in `.claude/agents/`): `ceo` (strategy and priorities), `cfo` (pricing and unit economics), `designer` (mobile screens, copy and accessibility), `developer` (code changes via PR) and `tester` (independent QA). They run as an automated cycle twice a day: see `AUTOMATION.md`. The prioritised to-do list is `BACKLOG.md`.
 
 **Done so far**
-- Mobile: Supabase sign-in, bills/medicines/appointments/to-dos, recurrence with month-end and UK clock-change handling, Today briefing, native alarm module, payday calendar on Today, one-tap UK bill templates, "Who is this for?" labels, annual-plan saving badge, RevenueCat paywall code (not live), data export and account deletion. Typecheck, lint and 11 tests pass.
+- Mobile: Supabase sign-in, bills/medicines/appointments/to-dos, recurrence with month-end and UK clock-change handling, Today briefing, native alarm module, and the payday calendar on Today.
+- Mobile tabs: Today, Dashboard, Bills, Medicines, Planner and Account, with same-size icons. A round + button on every tab adds things.
+- Mobile Dashboard: this month's bill total, still to pay, a category donut with the total in the middle, medicines taken today, and plans for the next 7 days.
+- Mobile Bills tab: the donut, plus a this month vs last month line chart.
+- Mobile extras: one-tap UK bill templates, "Who is this for?" labels, the annual-plan saving badge, RevenueCat paywall code with a 1-month free trial and a 3-day reminder (not live yet), data export and account deletion.
+- Mobile checks: typecheck, lint and tests pass.
+- Open PR #9: red marking for missed bills and doses, a red follow-up reminder, and the line chart on the Dashboard as well.
 - Web: sign-in preview, sample dashboard (responsive, priority alert banner), pricing/privacy/terms/support pages, account deletion page, `/#/verified` page for email confirmation and password reset.
 - Backend: deletion, owner metrics and webhook functions deployed; subscription sync SQL applied.
 
@@ -29,6 +37,6 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 4. Supabase leaked-password protection is off.
 5. Reminder reliability on a physical phone (background refresh, course endings, subscription expiry) is untested. Do not market as a reliable alarm yet.
 6. No store accounts, RevenueCat project, real support email, or reviewed privacy/terms yet.
-7. Web dashboard Bills, Medicines and Appointments tabs are placeholders.
+7. Web dashboard Bills, Medicines and Appointments tabs are placeholders (low priority: mobile first).
 
 **Rules.** No em dashes in user-facing text. Money in pence. Calendar dates from local date parts, not `toISOString()`. Never mark a launch checklist item true without evidence. Never put secret keys in the repo or in `EXPO_PUBLIC_*` variables.
