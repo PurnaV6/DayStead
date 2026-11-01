@@ -1,2 +1,0 @@
-// Common UK household bills for one-tap setup. Keep in sync with BILL_TEMPLATES in mobile/App.tsx.
-export const BILL_TEMPLATES: [string, string][] = [['Rent', 'Rent'], ['Mortgage', 'Mortgage'], ['Council tax', 'Council tax'], ['Energy', 'Utilities'], ['Water', 'Utilities'], ['Broadband', 'Utilities'], ['Mobile phone', 'Subscriptions'], ['TV licence', 'Subscriptions'], ['Car insurance', 'Car insurance'], ['Credit card', 'Credit card'], ['Streaming', 'Subscriptions']];

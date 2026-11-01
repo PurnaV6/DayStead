@@ -13,14 +13,13 @@ The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION
 Mobile only. The website is a showcase page; it changes only when an item says so.
 
 1. [ ] **Missed items from earlier months.** Today's "Needs your attention" only looks back to the 1st of this month, so a bill missed in late October disappears on 1 November. Look back 35 days.
-2. [ ] **Showcase website, no web app** (website only). Replace the website's sign-in and signed-in web app with one showcase page: what DayStead does, the price (1 month free, then £3.99/month or £35.99/year), three screenshots, and "Get it on Google Play" and "Download on the App Store" buttons (both shown as "Coming soon" until each listing is live). Remove `web/src/app/` and its routes. Keep `/privacy`, `/terms`, `/support`, `/delete-account` and `/verified`.
-3. [ ] **Google Play listing and Android release build** (CEO, designer, developer). Play Store title, short and full description, screenshots plan and data safety answers in `release/store-listing.md` (no medical claims), and an EAS Android production build profile. Android first; Apple later.
-4. [ ] **Subscription required to use the app.** After sign-up the app shows "Start your free month". Google Play (later Apple) asks for the card, checks it, and charges automatically after the free month unless cancelled; DayStead never handles card details. Without an active trial or subscription the app shows only the paywall, Restore purchase, Sign out, Export my data and Delete account; records stay saved and come back on subscribing. Only switches on when billing is enabled, so testing stays open. Add `supabase/require-subscription.sql` (row-level security: read and write records only with an active trial or subscription) for Purna to run at launch.
-5. [ ] **Free launch plan for carers** (CEO and CFO). Free promotion only: carers groups, carers centres, Reddit and the survey testers, plus a partnership outreach list for carers centres and councils, with the cost per paying user each approach would need to beat, saved in `research/`.
-6. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
-7. [ ] **Accessibility pass on mobile.** Screen-reader labels on every icon and button, checked with large text, 44pt touch targets, and AA contrast.
-8. [ ] **Reminder tests.** Unit tests for `reconcileReminders` limits: at most 48 alerts plus 12 missed follow-ups plus the trial notice, staying under iOS's limit of 64 pending notifications.
-9. [ ] **Friendly offline and error states.** Show clear messages when Supabase can't be reached, instead of raw error text.
+2. [ ] **Google Play listing and Android release build** (CEO, designer, developer). Play Store title, short and full description, screenshots plan and data safety answers in `release/store-listing.md` (no medical claims), and an EAS Android production build profile. Android first; Apple later.
+3. [ ] **Subscription required to use the app.** After sign-up the app shows "Start your free month". Google Play (later Apple) asks for the card, checks it, and charges automatically after the free month unless cancelled; DayStead never handles card details. Without an active trial or subscription the app shows only the paywall, Restore purchase, Sign out, Export my data and Delete account; records stay saved and come back on subscribing. Only switches on when billing is enabled, so testing stays open. Add `supabase/require-subscription.sql` (row-level security: read and write records only with an active trial or subscription) for Purna to run at launch.
+4. [ ] **Free launch plan for carers** (CEO and CFO). Free promotion only: carers groups, carers centres, Reddit and the survey testers, plus a partnership outreach list for carers centres and councils, with the cost per paying user each approach would need to beat, saved in `research/`.
+5. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
+6. [ ] **Accessibility pass on mobile.** Screen-reader labels on every icon and button, checked with large text, 44pt touch targets, and AA contrast.
+7. [ ] **Reminder tests.** Unit tests for `reconcileReminders` limits: at most 48 alerts plus 12 missed follow-ups plus the trial notice, staying under iOS's limit of 64 pending notifications.
+8. [ ] **Friendly offline and error states.** Show clear messages when Supabase can't be reached, instead of raw error text.
 
 ## Done
 - Owner ran `supabase/for-person.sql` and added the website redirect URL in Supabase.
@@ -31,3 +30,4 @@ Mobile only. The website is a showcase page; it changes only when an item says s
 - Red marking for missed bills and doses, and the month comparison chart on the Dashboard (PR #9).
 - The website is now the signed-in web version of the app, with the same features as mobile (PR #12).
 - First-run setup guide on mobile and the website: payday, first bill, reminders; every step skippable (PR #11).
+- Showcase website with Google Play and App Store buttons; the web app was removed (mobile only).
