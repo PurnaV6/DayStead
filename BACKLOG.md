@@ -11,17 +11,17 @@ The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION
 - [ ] Apple and Google developer accounts, a RevenueCat project, the 1-month free trial offers, and a real support email. [blocked: owner]
 
 ## Next up (agents)
-1. [ ] **First-run setup on mobile.** After sign-up, a 3-step guide: set your payday, add your first bill (with the quick-add templates), and turn on reminders. Each step can be skipped. Activation is the main early risk.
-2. [ ] **Missed items from earlier months.** Today's "Needs your attention" only looks back to the 1st of this month, so a bill missed in late October disappears on 1 November. Look back 35 days. Depends on PR #9.
-3. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
-4. [ ] **Accessibility pass on mobile.** Screen-reader labels on every icon and button, checked with large text, 44pt touch targets, and AA contrast.
-5. [ ] **Reminder tests.** Unit tests for `reconcileReminders` limits: at most 48 alerts plus 12 missed follow-ups plus the trial notice, staying under iOS's limit of 64 pending notifications.
-6. [ ] **Friendly offline and error states.** Show clear messages when Supabase can't be reached, instead of raw error text.
-7. [ ] **Store listing draft** (CEO and designer). App Store and Google Play title, subtitle, description, keywords and a screenshot plan, saved in `release/store-listing.md`. Wording checked against store rules; no medical claims.
-8. [ ] **Launch plan for carers** (CEO and CFO). A partnership outreach list for carers centres and councils, with the cost per paying user each approach would need to beat, saved in `research/`.
+1. [ ] **Missed items from earlier months.** Today's "Needs your attention" only looks back to the 1st of this month, so a bill missed in late October disappears on 1 November. Look back 35 days. Depends on PR #9.
+2. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
+3. [ ] **Accessibility pass on mobile.** Screen-reader labels on every icon and button, checked with large text, 44pt touch targets, and AA contrast.
+4. [ ] **Reminder tests.** Unit tests for `reconcileReminders` limits: at most 48 alerts plus 12 missed follow-ups plus the trial notice, staying under iOS's limit of 64 pending notifications.
+5. [ ] **Friendly offline and error states.** Show clear messages when Supabase can't be reached, instead of raw error text.
+6. [ ] **Store listing draft** (CEO and designer). App Store and Google Play title, subtitle, description, keywords and a screenshot plan, saved in `release/store-listing.md`. Wording checked against store rules; no medical claims.
+7. [ ] **Launch plan for carers** (CEO and CFO). A partnership outreach list for carers centres and councils, with the cost per paying user each approach would need to beat, saved in `research/`.
 
 ## Done
 - Bills, medicines, appointments and to-dos; recurrence; payday calendar; alarm-style medicine reminders.
 - 1-month free trial paywall code, a 3-day trial-end reminder, and the annual saving badge.
 - Quick-add UK bill templates and "Who is this for?" (PR #6).
 - A + button on every tab, and a Dashboard tab with the bill total and donut chart (PR #8).
+- First-run setup guide on mobile: payday, first bill, reminders; every step skippable (this PR).
