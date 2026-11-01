@@ -1,7 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import {alarmStatus,replaceAlarms} from './alarm';
 import {Platform} from 'react-native';
-import {Occurrence, plannedAlerts, nativeAlarmCandidates} from './domain';
+import {Occurrence, plannedAlerts, nativeAlarmCandidates, missedFollowUps} from './domain';
 
 Notifications.setNotificationHandler({handleNotification:async()=>({shouldShowBanner:true,shouldShowList:true,shouldPlaySound:true,shouldSetBadge:false})});
 export async function enableReminders(){
@@ -53,6 +53,13 @@ export function reconcileReminders(items:Occurrence[], enabled:boolean){
    identifier:alert.occurrence.key+'|'+alert.minutes,
    content:{title:'Daystead reminder',body:'You have a scheduled item. Open Daystead to review it.',sound:'default',data:{scheduleId:alert.occurrence.schedule.id,occurrenceAt:alert.occurrence.at.toISOString()}},
    trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:alert.at,channelId:'daystead'}
+  });
+  // One red follow-up if a bill or dose is still unmarked. Wording stays generic, like the other reminders, so the lock screen does not reveal bills or medicines. Capped so the total stays under iOS's 64 pending notifications.
+  // The red accent shows on Android; iOS does not allow coloured notifications.
+  for(const follow of missedFollowUps(items,new Date()).slice(0,12))await Notifications.scheduleNotificationAsync({
+   identifier:follow.occurrence.key+'|missed',
+   content:{title:'Missed: Daystead reminder',body:'Something due earlier has not been marked as done. Open Daystead to review it.',sound:'default',color:'#B3261E',data:{scheduleId:follow.occurrence.schedule.id,occurrenceAt:follow.occurrence.at.toISOString()}},
+   trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:follow.at,channelId:'daystead'}
   });
   return {count:alerts.length,through:alerts.at(-1)?.at??null,alarmNote};
  };

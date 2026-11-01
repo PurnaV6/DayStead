@@ -58,3 +58,19 @@ export function formatDoseTime(minutes:number){
 export function nativeAlarmCandidates(items:Occurrence[], limit=48){
  return items.filter(o=>!o.status&&o.schedule.kind==='medicine'&&o.schedule.reminder_mode==='alarm').sort((a,b)=>+a.at-+b.at).slice(0,limit);
 }
+
+// A dose counts as missed this long after its time with nothing recorded.
+export const MISSED_DOSE_MINUTES=30;
+// Missed: a bill whose due day has ended unpaid, or a dose 30+ minutes late with nothing recorded.
+// Appointments and to-dos are never "missed" here.
+export function isMissed(o:Occurrence, now:Date){
+ if(o.status)return false;
+ if(o.schedule.kind==='bill')return o.at<new Date(now.getFullYear(),now.getMonth(),now.getDate());
+ if(o.schedule.kind==='medicine')return +o.at<=+now-MISSED_DOSE_MINUTES*60000;
+ return false;
+}
+// One follow-up reminder per item if it is still unrecorded: 9am the day after a bill's due date,
+// or 30 minutes after a dose. Cancelled with everything else when the item is marked.
+export function missedFollowUps(items:Occurrence[], now:Date){
+ return items.filter(o=>!o.status&&(o.schedule.kind==='bill'||o.schedule.kind==='medicine')).map(o=>({occurrence:o,at:o.schedule.kind==='bill'?new Date(o.at.getFullYear(),o.at.getMonth(),o.at.getDate()+1,9):new Date(+o.at+MISSED_DOSE_MINUTES*60000)})).filter(f=>f.at>now).sort((a,b)=>+a.at-+b.at);
+}
