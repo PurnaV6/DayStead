@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react';
-import {Alert,Platform,Pressable,ScrollView,StyleSheet,Text,View} from 'react-native';
+import {Alert,BackHandler,Platform,Pressable,ScrollView,StyleSheet,Text,View} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {supabase} from './supabase';
 
@@ -15,7 +15,9 @@ type Props={userId:string;firstBill:string|null;remindersOn:boolean;templates:[s
 export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onTurnOnReminders,onClose}:Props){
  const [step,setStep]=useState(0),[payday,setPayday]=useState(''),[picking,setPicking]=useState(Platform.OS==='ios'),[saving,setSaving]=useState(false),[asking,setAsking]=useState(false);
  const now=new Date(),todayStart=new Date(now.getFullYear(),now.getMonth(),now.getDate());
- useEffect(()=>{let active=true;supabase.from('daystead_preferences').select('payday').eq('user_id',userId).maybeSingle().then(({data})=>{if(active&&data?.payday&&new Date(data.payday+'T23:59:59')>=new Date())setPayday(data.payday)});return()=>{active=false}},[userId]);
+ useEffect(()=>{let active=true;supabase.from('daystead_preferences').select('payday').eq('user_id',userId).maybeSingle().then(({data})=>{if(active&&data?.payday&&new Date(data.payday+'T23:59:59')>=new Date())setPayday(p=>p||data.payday)});return()=>{active=false}},[userId]);
+ // Android back goes to the previous step; on the first step it closes the guide.
+ useEffect(()=>{const sub=BackHandler.addEventListener('hardwareBackPress',()=>{if(step>0)setStep(step-1);else onClose();return true});return()=>sub.remove()},[step,onClose]);
  const next=()=>{if(step<STEPS-1)setStep(step+1);else onClose()};
  async function savePayday(){
   if(!payday){next();return}
@@ -38,7 +40,7 @@ export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onT
     <Text style={g.title} accessibilityRole="header">When are you next paid?</Text>
     <Text style={g.text}>Daystead adds up the bills due before then, so you know how much to keep aside.</Text>
     {Platform.OS!=='ios'&&<Pressable accessibilityRole="button" accessibilityLabel={payday?'Payday '+paydayLabel+'. Change':'Choose your next payday'} onPress={()=>setPicking(true)} style={g.field}><Text style={{color:C.ink,fontSize:15}}>{payday?paydayLabel:'Choose your next payday'}</Text><Text style={g.link}>{payday?'Change':'Choose'}</Text></Pressable>}
-    {picking&&<DateTimePicker value={payday?new Date(payday+'T12:00:00'):todayStart} mode="date" display={Platform.OS==='ios'?'inline':'calendar'} minimumDate={todayStart} maximumDate={new Date(+todayStart+366*86400000)} accentColor={C.green} onChange={(event,selected)=>{if(Platform.OS==='android')setPicking(false);if(event.type==='dismissed'||!selected)return;setPayday(ymd(selected))}}/>}
+    {picking&&<DateTimePicker value={payday?new Date(payday+'T12:00:00'):new Date(+todayStart+86400000)} mode="date" display={Platform.OS==='ios'?'inline':'calendar'} minimumDate={todayStart} maximumDate={new Date(+todayStart+366*86400000)} accentColor={C.green} onChange={(event,selected)=>{if(Platform.OS==='android')setPicking(false);if(event.type==='dismissed'||!selected)return;setPayday(ymd(selected))}}/>}
     {Platform.OS==='ios'&&!!payday&&<Text style={g.text}>Payday: {paydayLabel}</Text>}
     <Primary title={saving?'Saving…':'Save and continue'} disabled={!payday||saving} onPress={()=>void savePayday()}/>
    </>}
