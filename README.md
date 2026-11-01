@@ -16,7 +16,7 @@ New here? Read [HANDOFF.md](HANDOFF.md) first.
 
 ```bash
 cd mobile && npm ci && npm run typecheck && npm run lint && TZ=Europe/London npm test
-cd web && npm ci && npm run check:shared && npx tsc --noEmit && npx vite build
+cd web && npm ci && npx tsc --noEmit && npx vite build
 ```
 
 Work on a branch and open a pull request; do not push to `main`.
