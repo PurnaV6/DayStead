@@ -2,6 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import {Text} from './Text';
 import Svg,{Circle,Polyline,Line} from 'react-native-svg';
+import {DrawIn,SpinIn} from './motion';
 import {Occurrence,pounds} from './domain';
 const palette=['#2D6554','#9CBCA6','#D4A864','#809EB7','#AD91B9','#D0CCC2'];
 const total=(items:Occurrence[])=>items.reduce((s,o)=>s+(o.schedule.amount_pence||0),0);
@@ -12,7 +13,7 @@ export function BillDonut({current,size=146}:{current:Occurrence[];size?:number}
  const circumference=2*Math.PI*58;
  const arcs=entries.map(([label,value],i)=>({label,len:sum?value/sum*circumference:0,start:entries.slice(0,i).reduce((n,[,v])=>n+(sum?v/sum*circumference:0),0)}));
  return <View style={{flexDirection:'row',alignItems:'center',gap:16}}>
-  <View style={{width:size,height:size,alignItems:'center',justifyContent:'center'}}><Svg width={size} height={size} viewBox="0 0 146 146" style={{position:'absolute'}}><Circle cx={73} cy={73} r={58} stroke="#EEEDE7" strokeWidth={19} fill="none"/>{arcs.map(({label,len,start},i)=><Circle key={label} cx={73} cy={73} r={58} stroke={palette[i%palette.length]} strokeWidth={19} fill="none" strokeDasharray={`${len} ${circumference-len}`} strokeDashoffset={-start} rotation={-90} origin="73,73"/>)}</Svg><Text style={{fontSize:11,color:'#68756E'}}>Total</Text><Text numberOfLines={1} adjustsFontSizeToFit style={{fontSize:size>=170?19:15,fontWeight:'700',color:'#193D31',maxWidth:size*.62,textAlign:'center'}}>{pounds(sum)}</Text></View>
+  <View style={{width:size,height:size,alignItems:'center',justifyContent:'center'}}><View style={{position:'absolute'}}><SpinIn><Svg width={size} height={size} viewBox="0 0 146 146"><Circle cx={73} cy={73} r={58} stroke="#EEEDE7" strokeWidth={19} fill="none"/>{arcs.map(({label,len,start},i)=><Circle key={label} cx={73} cy={73} r={58} stroke={palette[i%palette.length]} strokeWidth={19} fill="none" strokeDasharray={`${len} ${circumference-len}`} strokeDashoffset={-start} rotation={-90} origin="73,73"/>)}</Svg></SpinIn></View><Text style={{fontSize:11,color:'#68756E'}}>Total</Text><Text numberOfLines={1} adjustsFontSizeToFit style={{fontSize:size>=170?19:15,fontWeight:'700',color:'#193D31',maxWidth:size*.62,textAlign:'center'}}>{pounds(sum)}</Text></View>
   <View style={{flex:1,gap:8}}>{entries.map(([label,value],i)=><Text key={label} style={{color:'#193D31',fontSize:13}}><Text style={{color:palette[i%palette.length]}}>●</Text> {label} · {pounds(value)}</Text>)}{!entries.length&&<Text style={{color:'#68756E',fontSize:14,lineHeight:21}}>No bills this month yet. Tap + to add your first bill and the chart fills in.</Text>}</View>
  </View>;
 }
@@ -22,7 +23,7 @@ export function BillTrend({current,previous}:{current:Occurrence[];previous:Occu
  const points=(items:Occurrence[])=>Array.from({length:31},(_,i)=>({x:12+i*9,y:120-items.filter(o=>o.at.getDate()<=i+1).reduce((s,o)=>s+(o.schedule.amount_pence||0),0)/Math.max(sum,prior,1)*100})).map(p=>`${p.x},${p.y}`).join(' ');
  return <View style={{gap:16}}>
  <Text style={{fontSize:20,fontWeight:'600',color:'#193D31'}}>This month vs last month</Text><Text style={{color:'#68756E'}}>Cumulative bills by day of the month · last month dashed</Text>
- <Svg width="100%" height={145} viewBox="0 0 300 145"><Line x1={12} x2={282} y1={120} y2={120} stroke="#D8DFD7"/>{previous.length>0&&<Polyline points={points(previous)} fill="none" stroke="#B1B6AD" strokeWidth={3} strokeDasharray="5 5"/>}{current.length>0&&<Polyline points={points(current)} fill="none" stroke="#2D6554" strokeWidth={3}/>}</Svg>
+ <DrawIn><Svg width="100%" height={145} viewBox="0 0 300 145"><Line x1={12} x2={282} y1={120} y2={120} stroke="#D8DFD7"/>{previous.length>0&&<Polyline points={points(previous)} fill="none" stroke="#B1B6AD" strokeWidth={3} strokeDasharray="5 5"/>}{current.length>0&&<Polyline points={points(current)} fill="none" stroke="#2D6554" strokeWidth={3}/>}</Svg></DrawIn>
  <Text style={{color:'#68756E'}}>1st                         15th                         31st</Text>
  <Text style={{color:'#193D31'}}>{!previous.length?'No previous-month data to compare.':`${pounds(Math.abs(sum-prior))} ${sum>=prior?'more':'less'} than last month${prior?' · '+Math.abs((sum-prior)/prior*100).toFixed(1)+'%':''}`}</Text></View>;
 }

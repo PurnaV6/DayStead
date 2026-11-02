@@ -1,5 +1,6 @@
 import React,{useEffect,useState,useSyncExternalStore,type ReactNode} from 'react';
-import {AccessibilityInfo,Animated,Dimensions,Easing,Pressable,type PressableProps,type StyleProp,type ViewStyle} from 'react-native';
+import {AccessibilityInfo,Animated,Dimensions,Easing,Pressable,View,type PressableProps,type StyleProp,type TextStyle,type ViewStyle} from 'react-native';
+import {Text} from '../Text';
 import * as Haptics from 'expo-haptics';
 
 // DayStead's shared motion kit. Same feel as the website: quick, calm ease-out movement,
@@ -63,4 +64,85 @@ export function useSheet(open:boolean){
   backdrop:{opacity:v},
   sheet:{transform:[{translateY:v.interpolate({inputRange:[0,1],outputRange:[Dimensions.get('window').height,0]})}]},
  };
+}
+
+// For code outside components (for example before a layout animation).
+export const isReducedMotion=()=>reducedNow;
+
+// A number that counts up (or down) to its new value. `format` turns the number into text.
+export function CountUp({value,format,style,duration=650}:{value:number;format:(n:number)=>string;style?:StyleProp<TextStyle>;duration?:number}){
+ // Starts at zero so the total counts up when the screen opens, then moves smoothly on each change.
+ const v=useState(()=>new Animated.Value(0))[0];
+ const [shown,setShown]=useState(0);
+ const reduced=useReducedMotion();
+ useEffect(()=>{
+  if(reduced){v.setValue(value);return}
+  const id=v.addListener(({value:n})=>setShown(n));
+  const a=Animated.timing(v,{toValue:value,duration,easing:ease.out,useNativeDriver:false});a.start();
+  return()=>{a.stop();v.removeListener(id)};
+ },[value,reduced,duration,v]);
+ return <Text style={style} accessibilityLabel={format(value)}>{format(Math.round(reduced?value:shown))}</Text>;
+}
+
+// A small tick that pops in once when an item is marked done.
+export function Tick({children}:{children:ReactNode}){
+ const v=useState(()=>new Animated.Value(0))[0];
+ const reduced=useReducedMotion();
+ useEffect(()=>{
+  if(reduced){v.setValue(1);return}
+  Animated.timing(v,{toValue:1,duration:t.enter,easing:ease.out,useNativeDriver:true}).start();
+ },[reduced,v]);
+ return <Animated.View style={{opacity:v,transform:[{scale:v.interpolate({inputRange:[0,1],outputRange:[0.6,1]})}]}}>{children}</Animated.View>;
+}
+
+// A dot that pulses once when it first appears, then stays still (for missed items).
+export function PulseOnce({style}:{style:StyleProp<ViewStyle>}){
+ const v=useState(()=>new Animated.Value(0))[0];
+ const reduced=useReducedMotion();
+ useEffect(()=>{
+  if(reduced)return;
+  Animated.sequence([Animated.timing(v,{toValue:1,duration:260,easing:ease.out,useNativeDriver:true}),Animated.timing(v,{toValue:0,duration:340,easing:ease.soft,useNativeDriver:true})]).start();
+ },[reduced,v]);
+ return <Animated.View style={[style,{transform:[{scale:v.interpolate({inputRange:[0,1],outputRange:[1,1.7]})}]}]}/>;
+}
+
+// Reveals its content left to right once, like a chart being drawn. `cover` is the background colour behind it.
+export function DrawIn({children,cover='white'}:{children:ReactNode;cover?:string}){
+ const v=useState(()=>new Animated.Value(0))[0];
+ const [w,setW]=useState(0);
+ const reduced=useReducedMotion();
+ useEffect(()=>{
+  if(!w)return;
+  if(reduced){v.setValue(1);return}
+  Animated.timing(v,{toValue:1,duration:700,easing:ease.out,useNativeDriver:true}).start();
+ },[w,reduced,v]);
+ return <View onLayout={e=>setW(e.nativeEvent.layout.width)} style={{overflow:'hidden'}}>
+  {children}
+  {!reduced&&<Animated.View pointerEvents="none" style={{position:'absolute',top:0,bottom:0,left:0,width:w||9999,backgroundColor:cover,transform:[{translateX:v.interpolate({inputRange:[0,1],outputRange:[0,w||9999]})}]}}/>}
+ </View>;
+}
+
+// Turns gently into place once, like a donut chart filling in.
+export function SpinIn({children}:{children:ReactNode}){
+ const v=useState(()=>new Animated.Value(0))[0];
+ const reduced=useReducedMotion();
+ useEffect(()=>{
+  if(reduced){v.setValue(1);return}
+  Animated.timing(v,{toValue:1,duration:650,easing:ease.out,useNativeDriver:true}).start();
+ },[reduced,v]);
+ return <Animated.View style={{opacity:v,transform:[{rotate:v.interpolate({inputRange:[0,1],outputRange:['-40deg','0deg']})},{scale:v.interpolate({inputRange:[0,1],outputRange:[0.9,1]})}]}}>{children}</Animated.View>;
+}
+
+// Soft placeholder shapes while records load, breathing gently. Static with Reduce Motion.
+export function Placeholder({heights=[150,84,84,84]}:{heights?:number[]}){
+ const v=useState(()=>new Animated.Value(0))[0];
+ const reduced=useReducedMotion();
+ useEffect(()=>{
+  if(reduced)return;
+  const loop=Animated.loop(Animated.sequence([Animated.timing(v,{toValue:1,duration:700,easing:ease.soft,useNativeDriver:true}),Animated.timing(v,{toValue:0,duration:700,easing:ease.soft,useNativeDriver:true})]));
+  loop.start();return()=>loop.stop();
+ },[reduced,v]);
+ return <View accessible accessibilityLabel="Loading your day" style={{gap:14}}>
+  {heights.map((h,i)=><Animated.View key={i} style={{height:h,borderRadius:22,backgroundColor:i===0?'#DCE5D9':'#ECEFE7',opacity:v.interpolate({inputRange:[0,1],outputRange:[1,0.55]})}}/>)}
+ </View>;
 }
