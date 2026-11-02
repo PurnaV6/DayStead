@@ -23,14 +23,14 @@ DayStead keeps your bills, medicine reminders and appointments in one calm place
 Life admin ends up everywhere: a council tax letter on the side, tablets in a box by the kettle, the dentist on the fridge. DayStead puts it all in one list on your phone, in the order it is due.
 
 BILLS, BEFORE PAYDAY
-• Add common UK bills in one tap: council tax, energy, water, broadband, TV licence and more
+• Start common UK bills in one tap: council tax, energy, water, broadband, TV licence and more
 • See how much you need before your next payday, based on the bills you have entered
 • A reminder 3 days before each bill is due
 • Missed a bill? It turns red and you get one more reminder the next morning
 • See where the month goes, and this month against last month
 
 MEDICINE REMINDERS
-• Reminders at the times you were prescribed, several times a day if needed
+• Reminders 10 and 5 minutes before, and at, the times you were prescribed, several times a day if needed
 • Optional alarm-style reminder on Android that rings even when your phone is locked
 • Mark a dose taken or skipped, or snooze it for 5 minutes without moving the rest of the day
 • A dose left unmarked turns red after 30 minutes
@@ -41,20 +41,21 @@ APPOINTMENTS AND TO-DOS
 • Repeat daily, weekly or monthly, with an end date
 
 FOR YOU, OR SOMEONE YOU LOOK AFTER
-Add items for Mum, Dad, a partner or a child alongside your own. Every item says who it is for.
+Add items for Mum, Dad, a partner or a child alongside your own. Items for someone else show who they are for.
 
 PRIVATE BY DESIGN
-• Reminders only say "DayStead reminder", so nothing private shows on your lock screen
-• Export your data or delete your account from the app at any time
+• Bill, medicine and appointment reminders only say "DayStead reminder", so nothing private shows on your lock screen
+• Export your data or delete your account from the app at any time (deleting your account does not cancel a Google Play subscription)
 • Payments go through Google Play. DayStead never sees your card details
 • Your data is never sold
 
 PRICING
+(Include this paragraph only once billing is live. For the closed test, leave it out.)
 Your first month is free. Then £3.99 a month or £35.99 a year. Google Play asks for a payment method when your free month starts, and you pay nothing that day. We remind you 3 days before the free month ends, and you can cancel any time in Google Play.
 
 DayStead does not make payments, connect to your bank or check your balance. You mark bills paid yourself.
 
-Questions? Visit our help centre at daystead.app/support
+Questions? Visit our help centre at daystead.app/#/support
 ```
 
 (About 2,100 characters; room to add a short "What people say" section once real reviews exist. Never invent quotes.)
@@ -120,10 +121,10 @@ Captions can be added on top of the screenshots later by the designer; plain scr
 | Other financial info (bill names, amounts, due dates, paid status) | Yes | No | App functionality | Required for bills |
 | Purchase history (subscription status via Google Play and RevenueCat) | Yes | No | App functionality (access to features) | Required |
 | Health info (medicine names, dose times, taken or skipped records) | Yes | No | App functionality | Optional (only if the user adds medicines) |
-| Other user-generated content (appointments, to-dos, notes, "who is this for") | Yes | No | App functionality | Optional |
+| Other user-generated content (appointments, to-dos, notes, "who is this for", payday date) | Yes | No | App functionality | Optional |
 | Location, contacts, photos, device or other IDs, advertising ID | No | | | |
 
-Then answer: data is encrypted in transit (yes, HTTPS); users can request deletion (yes, in the app at Account > Delete account, and at the delete account page on the website); data is not sold; no data is used for advertising. Service providers that process data for us (Supabase for storage, RevenueCat and Google Play for subscriptions) are not "sharing" under Google's definitions.
+Before submitting, check RevenueCat's current Google Play data safety guidance in case its SDK needs extra entries (for example device or other IDs). Then answer: data is encrypted in transit (yes, HTTPS); users can request deletion (yes, in the app under Account & help > Delete account, and at the delete account page on the website); data is not sold; no data is used for advertising. Service providers that process data for us (Supabase for storage, RevenueCat and Google Play for subscriptions) are not "sharing" under Google's definitions.
 
 **Account deletion URL** (required for apps with accounts): `https://daystead.app/#/delete-account` (until then `https://web-mwdx.vercel.app/#/delete-account`).
 
@@ -146,6 +147,8 @@ Then answer: data is encrypted in transit (yes, HTTPS); users can request deleti
   - `playtest`: a Play-ready `.aab` for the internal and closed tests. It is not blocked by the release guard, because testing is not a public release.
   - `production`: the public release. Still blocked by `scripts/check-release.cjs` until every item in `mobile/launch-status.json` is true and billing, privacy, terms and support links are set. The guard was not weakened.
 - **Uploads go in as drafts** (`releaseStatus: draft`), so nothing reaches users until Purna presses release in Play Console.
+- **Only `playtest` can be submitted for now.** The `production` submit profile is left out on purpose, so a test build (billing off, everyone gets full access) can never be sent to the production track by mistake. It is added back, together with live billing, when the launch checklist passes. **Never promote a `playtest` build to production in Play Console.**
+- **Lock-screen privacy:** the Android alarm notification now says "DayStead reminder" too (it used to say "Medicine reminder").
 - **Risk to watch:** the alarm uses a "media playback" foreground service. Google sometimes questions this type for alarms. If the declaration is rejected, the fix is a small native change (a different service type, or a full-screen alarm notification). Decide only if Google asks; the closed test will show it early.
 - **Signing:** let EAS create and manage the upload key on the first `playtest` build, and enrol in Play App Signing (the default). Never commit keystores or the Google service account file to the repo.
 
@@ -160,4 +163,5 @@ Then answer: data is encrypted in transit (yes, HTTPS); users can request deleti
 5. On your computer, in `mobile/`: `npx eas-cli@latest build --platform android --profile playtest`. EAS asks to create a signing key: say yes.
 6. Upload the build: `npx eas-cli@latest submit --platform android --profile playtest` (the first time, Play Console may require a manual upload of the `.aab` from the EAS build page to the Internal testing track instead).
 7. Internal testing first (you and a friend), then Closed testing with your 12 testers for 14 days, then apply for production.
-8. Subscriptions and RevenueCat come after the first upload (Google only allows creating subscriptions once a build exists).
+8. Leave the PRICING paragraph out of the description until billing is live.
+9. Subscriptions and RevenueCat come after the first upload (Google only allows creating subscriptions once a build exists).
