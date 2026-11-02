@@ -1,5 +1,5 @@
-import React,{useEffect,useState,type ReactNode} from 'react';
-import {AccessibilityInfo,Animated,Easing,Pressable,type PressableProps,type StyleProp,type ViewStyle} from 'react-native';
+import React,{useEffect,useState,useSyncExternalStore,type ReactNode} from 'react';
+import {AccessibilityInfo,Animated,Dimensions,Easing,Pressable,type PressableProps,type StyleProp,type ViewStyle} from 'react-native';
 import * as Haptics from 'expo-haptics';
 
 // DayStead's shared motion kit. Same feel as the website: quick, calm ease-out movement,
@@ -7,17 +7,14 @@ import * as Haptics from 'expo-haptics';
 export const ease={out:Easing.bezier(0.22,1,0.36,1),soft:Easing.bezier(0.33,1,0.68,1)};
 export const t={press:140,ui:240,enter:380,sheet:320};
 
-// Follows the phone's Reduce Motion setting, live.
-export function useReducedMotion(){
- const [reduced,setReduced]=useState(false);
- useEffect(()=>{
-  let active=true;
-  AccessibilityInfo.isReduceMotionEnabled().then(v=>{if(active)setReduced(v)}).catch(()=>{});
-  const sub=AccessibilityInfo.addEventListener('reduceMotionChanged',setReduced);
-  return()=>{active=false;sub.remove()};
- },[]);
- return reduced;
-}
+// The phone's Reduce Motion setting, read once and shared by every animated element.
+let reducedNow=false;
+const listeners=new Set<()=>void>();
+const setReduced=(v:boolean)=>{reducedNow=v;listeners.forEach(l=>l())};
+AccessibilityInfo.isReduceMotionEnabled().then(setReduced).catch(()=>{});
+AccessibilityInfo.addEventListener('reduceMotionChanged',setReduced);
+const subscribe=(l:()=>void)=>{listeners.add(l);return()=>{listeners.delete(l)}};
+export function useReducedMotion(){return useSyncExternalStore(subscribe,()=>reducedNow,()=>false)}
 
 // Small physical feedback on key moments. Failures are ignored: haptics are a nice-to-have.
 export const haptic={
@@ -27,13 +24,13 @@ export const haptic={
 };
 
 // A Pressable that gives slightly under the finger. Use it for buttons, tiles and chips.
+// The style (position, flex, size) stays on the touchable itself, so the tap area matches what you see.
+const AnimatedPressable=Animated.createAnimatedComponent(Pressable);
 export function PressableScale({style,children,scaleTo=0.97,onPressIn,onPressOut,...props}:Omit<PressableProps,'style'|'children'>&{style?:StyleProp<ViewStyle>;children?:ReactNode;scaleTo?:number}){
  const scale=useState(()=>new Animated.Value(1))[0];
  const reduced=useReducedMotion();
  const to=(v:number,d:number)=>Animated.timing(scale,{toValue:v,duration:reduced?0:d,easing:ease.out,useNativeDriver:true}).start();
- return <Pressable {...props} onPressIn={e=>{to(scaleTo,t.press);onPressIn?.(e)}} onPressOut={e=>{to(1,t.ui);onPressOut?.(e)}}>
-  <Animated.View style={[style,{transform:[{scale}]}]}>{children}</Animated.View>
- </Pressable>;
+ return <AnimatedPressable {...props} style={[style,{transform:[{scale}]}]} onPressIn={e=>{to(scaleTo,t.press);onPressIn?.(e)}} onPressOut={e=>{to(1,t.ui);onPressOut?.(e)}}>{children}</AnimatedPressable>;
 }
 
 // Content that fades and rises in when it first appears, or when `trigger` changes (for example the tab).
@@ -64,6 +61,6 @@ export function useSheet(open:boolean){
  return {
   mounted,
   backdrop:{opacity:v},
-  sheet:{transform:[{translateY:v.interpolate({inputRange:[0,1],outputRange:[360,0]})}]},
+  sheet:{transform:[{translateY:v.interpolate({inputRange:[0,1],outputRange:[Dimensions.get('window').height,0]})}]},
  };
 }
