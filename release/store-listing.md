@@ -44,7 +44,7 @@ FOR YOU, OR SOMEONE YOU LOOK AFTER
 Add items for Mum, Dad, a partner or a child alongside your own. Items for someone else show who they are for.
 
 PRIVATE BY DESIGN
-• Bill, medicine and appointment reminders only say "DayStead reminder", so nothing private shows on your lock screen
+• Bill, medicine and appointment reminders only say "DayStead reminder" (or "Missed: DayStead reminder"), so nothing private shows on your lock screen
 • Export your data or delete your account from the app at any time (deleting your account does not cancel a Google Play subscription)
 • Payments go through Google Play. DayStead never sees your card details
 • Your data is never sold
