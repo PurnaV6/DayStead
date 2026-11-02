@@ -1,6 +1,6 @@
 # DayStead agent team: automation cycle
 
-A scheduled task wakes the DayStead team session twice a day. Each run is one **cycle**. The five agents live in `.claude/agents/`: `ceo`, `cfo`, `designer`, `developer` and `tester`.
+A scheduled task wakes the DayStead team session twice a day. Each run is one **cycle**. The seven agents live in `.claude/agents/`: `ceo`, `cfo`, `cto`, `business-manager`, `designer`, `developer` and `tester`.
 
 ## One cycle
 1. **Check what's waiting.** Look at open pull requests on PurnaV6/DayStead.
@@ -8,6 +8,8 @@ A scheduled task wakes the DayStead team session twice a day. Each run is one **
    - If 3 or more team PRs are waiting for the owner to merge, do not start new work. Report what's waiting and stop.
 2. **CEO picks the task.** Take the top unblocked item in `BACKLOG.md`. The CEO may reorder the backlog, with a one-line reason.
 3. **CFO check.** Only needed if the task touches price, cost, billing or anything paid. The CFO confirms it fits the numbers in `.claude/agents/cfo.md`.
+   - **CTO check.** Only needed if the task adds a library or native module, or touches builds, notifications, alarms, billing code or the database. The CTO writes a short technical note before the developer starts.
+   - **Business manager.** Leads tasks about the store listing, promotion, partners, the survey or support content, and writes the copy and outreach drafts.
 4. **Designer specs.** For any screen change, the designer writes the spec, which goes in the PR description.
 5. **Developer builds.** Work on a branch named `claude/<topic>` from the latest `main` and run every check in `README.md`. For UI work, render the change and look at it. Then open a PR.
 6. **Tester reviews.** Independent check of the PR. The developer fixes every "blocks release" and "should fix" finding, then the tester re-checks.

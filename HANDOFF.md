@@ -17,7 +17,7 @@ Paste this into a new chat, or say "read HANDOFF.md in PurnaV6/DayStead".
 
 **Market research** (`research/market-2026-10.md`): no verified app combines bills, meds and appointments; £3.99 is at or below comparable apps; launch with unpaid carers via councils and carers centres; paid ads won't pay back at this price; lead with the annual plan because monthly churn is the main revenue risk.
 
-**Team agents** (in `.claude/agents/`): `ceo` (strategy and priorities), `cfo` (pricing and unit economics), `designer` (mobile screens, copy and accessibility), `developer` (code changes via PR) and `tester` (independent QA). They run as an automated cycle twice a day: see `AUTOMATION.md`. The prioritised to-do list is `BACKLOG.md`.
+**Team agents** (in `.claude/agents/`): `ceo` (strategy and priorities), `cfo` (pricing and unit economics), `cto` (technical decisions, dependencies, builds and reliability), `business-manager` (store listing, promotion, partners and support content), `designer` (mobile screens, copy and accessibility), `developer` (code changes via PR) and `tester` (independent QA). They run as an automated cycle twice a day: see `AUTOMATION.md`. The prioritised to-do list is `BACKLOG.md`.
 
 **Done so far**
 - Mobile: Supabase sign-in, bills/medicines/appointments/to-dos, recurrence with month-end and UK clock-change handling, Today briefing, native alarm module, and the payday calendar on Today.
