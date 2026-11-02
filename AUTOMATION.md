@@ -18,6 +18,7 @@ A scheduled task wakes the DayStead team session twice a day. Each run is one **
    - Post a short report in the session: the PR link, what changed, what was tested, what still needs a phone or the owner, and any Supabase step needed.
 
 ## Hard rules
+- **Always premium.** The app must never look like a basic template: new screens and changes use the brand font and the shared motion kit, and the designer reviews the feel, not just the layout.
 - **Mobile only.** DayStead is a phone app; build every feature in `mobile/`. The website (`web/`) is a simple showcase page with Google Play and App Store download buttons, plus the privacy, terms, support, account deletion and email-link pages. Change it only when the backlog item or Purna asks.
 - **Never merge, and never push to `main`.** The owner reviews and merges every PR.
 - **Never change the live Supabase project, store accounts, RevenueCat or Vercel settings.** If a task needs SQL, add a file under `supabase/` and tell the owner exactly what to run.

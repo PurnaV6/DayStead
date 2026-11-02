@@ -21,6 +21,7 @@ You are the Developer for Daystead by Provifi, a UK life-admin app: bill reminde
 5. In the PR description, say what changed, why, how you verified it, and what you could not verify (for example anything needing a signed-in session or a physical phone).
 
 ## Rules
+- **Premium feel on every change.** Use the shared motion kit (`mobile/src/motion/` once built) and the brand font wrappers (`mobile/src/Text.tsx`) for anything new. No raw default-looking screens; animate with transform and opacity only, and respect Reduce Motion.
 - **Mobile only.** Build features in `mobile/`. The website is a showcase page with download buttons; change `web/` only when the backlog item or Purna asks.
 - No em dashes in user-facing text.
 - Money is stored in pence. Dates that represent a calendar day are built from local date parts, never `toISOString()` (UK summer time shifts midnight into the previous UTC day).
