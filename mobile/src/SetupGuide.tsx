@@ -1,6 +1,7 @@
 import React,{useEffect,useState} from 'react';
 import {Alert,BackHandler,Platform,Pressable,ScrollView,StyleSheet,View} from 'react-native';
 import {Text} from './Text';
+import {PressableScale} from './motion';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {supabase} from './supabase';
 
@@ -49,7 +50,7 @@ export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onT
     <Text style={g.title} accessibilityRole="header">Add your first bill</Text>
     {firstBill?<View style={g.doneBox}><Text style={g.doneText}>✓ {firstBill} added</Text><Text style={g.text}>Add more any time with the + button.</Text></View>:<>
      <Text style={g.text}>Pick a common one to start. You add the amount and the date it is due.</Text>
-     <View style={g.chips}>{templates.map(t=><Pressable key={t[0]} accessibilityRole="button" accessibilityLabel={'Add '+t[0]} onPress={()=>onAddBill(t)} style={g.chip}><Text style={{color:C.ink,fontSize:15}}>{t[0]}</Text></Pressable>)}<Pressable accessibilityRole="button" accessibilityLabel="Add a different bill" onPress={()=>onAddBill()} style={g.chip}><Text style={{color:C.green,fontSize:15,fontWeight:'600'}}>Something else</Text></Pressable></View>
+     <View style={g.chips}>{templates.map(t=><PressableScale key={t[0]} accessibilityRole="button" accessibilityLabel={'Add '+t[0]} onPress={()=>onAddBill(t)} style={g.chip}><Text style={{color:C.ink,fontSize:15}}>{t[0]}</Text></PressableScale>)}<PressableScale accessibilityRole="button" accessibilityLabel="Add a different bill" onPress={()=>onAddBill()} style={g.chip}><Text style={{color:C.green,fontSize:15,fontWeight:'600'}}>Something else</Text></PressableScale></View>
     </>}
     {firstBill&&<Primary title="Continue" onPress={next}/>}
    </>}
@@ -68,7 +69,7 @@ export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onT
  </View>;
 }
 
-function Primary({title,onPress,disabled=false}:{title:string;onPress:()=>void;disabled?:boolean}){return <Pressable accessibilityRole="button" accessibilityState={{disabled}} disabled={disabled} onPress={onPress} style={[g.primary,disabled&&{opacity:.45}]}><Text style={{color:'white',fontWeight:'600',fontSize:15}}>{title}</Text></Pressable>}
+function Primary({title,onPress,disabled=false}:{title:string;onPress:()=>void;disabled?:boolean}){return <PressableScale accessibilityRole="button" accessibilityState={{disabled}} disabled={disabled} onPress={onPress} style={[g.primary,disabled&&{opacity:.45}]}><Text style={{color:'white',fontWeight:'600',fontSize:15}}>{title}</Text></PressableScale>}
 
 const g=StyleSheet.create({
  overlay:{flex:1,backgroundColor:C.paper,paddingTop:12},
