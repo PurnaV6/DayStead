@@ -7,6 +7,7 @@ The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION
 - [ ] Export the live schema into the repo (`supabase db dump --schema public > supabase/schema.sql`) so row-level security can be reviewed. [blocked: owner]
 - [ ] Finish the device tests in `release/device-tests.md`: tests 6 and 8 on Android, then all 8 on an iPhone. [blocked: owner]
 - [ ] **Android first, about £35:** buy `daystead.app` (Vercel, auto-renew on), Google Play developer account ($25), free support email (for example Zoho), RevenueCat project (free). [blocked: owner]
+- [ ] **Before launch (free):** run the survey, recruit 12 Google Play testers from it, and reserve @daystead on Instagram and TikTok. [blocked: owner]
 - [ ] **Later:** Apple Developer ($99/year) once Android has its first paying users; UK trademark for DayStead (class 9, £170) before any marketing spend. [blocked: owner]
 
 ## Next up (agents)
@@ -14,11 +15,12 @@ Mobile only. The website is a showcase page; it changes only when an item says s
 
 1. [ ] **Google Play listing and Android release build** (CEO, designer, developer). Play Store title, short and full description, screenshots plan and data safety answers in `release/store-listing.md` (no medical claims), and an EAS Android production build profile. Android first; Apple later.
 2. [ ] **Subscription required to use the app.** After sign-up the app shows "Start your free month". Google Play (later Apple) asks for the card, checks it, and charges automatically after the free month unless cancelled; DayStead never handles card details. Without an active trial or subscription the app shows only the paywall, Restore purchase, Sign out, Export my data and Delete account; records stay saved and come back on subscribing. Only switches on when billing is enabled, so testing stays open. Add `supabase/require-subscription.sql` (row-level security: read and write records only with an active trial or subscription) for Purna to run at launch.
-3. [ ] **Free launch plan for carers** (CEO and CFO). Free promotion only: carers groups, carers centres, Reddit and the survey testers, plus a partnership outreach list for carers centres and councils, with the cost per paying user each approach would need to beat, saved in `research/`.
-4. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
-5. [ ] **Accessibility pass on mobile.** Screen-reader labels on every icon and button, checked with large text, 44pt touch targets, and AA contrast.
-6. [ ] **Reminder tests.** Unit tests for `reconcileReminders` limits: at most 48 alerts plus 12 missed follow-ups plus the trial notice, staying under iOS's limit of 64 pending notifications.
-7. [ ] **Friendly offline and error states.** Show clear messages when Supabase can't be reached, instead of raw error text.
+3. [ ] **Ask happy users for a Play Store review.** After about 7 days of use, and only after a good moment (for example a bill marked paid or a dose marked taken), show Google Play's own in-app review prompt (`expo-store-review`). Ask at most once every few months, never during setup, a missed item or the paywall. No custom "rate us" screens or rewards for reviews, as store rules require. Add unit tests for the timing rule.
+4. [ ] **Free launch plan for carers** (CEO and CFO). Free promotion only: carers groups, carers centres, Reddit and the survey testers, plus a partnership outreach list for carers centres and councils, with the cost per paying user each approach would need to beat, saved in `research/`.
+5. [ ] **Split `mobile/App.tsx`.** It's one 30KB file. Move each tab into `mobile/src/screens/` with no behaviour change, so later work is safer to review.
+6. [ ] **Accessibility pass on mobile.** Screen-reader labels on every icon and button, checked with large text, 44pt touch targets, and AA contrast.
+7. [ ] **Reminder tests.** Unit tests for `reconcileReminders` limits: at most 48 alerts plus 12 missed follow-ups plus the trial notice, staying under iOS's limit of 64 pending notifications.
+8. [ ] **Friendly offline and error states.** Show clear messages when Supabase can't be reached, instead of raw error text.
 
 ## Done
 - Owner ran `supabase/for-person.sql` and added the website redirect URL in Supabase.
