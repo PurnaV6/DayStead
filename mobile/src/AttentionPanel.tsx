@@ -25,8 +25,11 @@ export function AttentionPanel({userId,schedules,done,now,onComplete,busy}:{user
  const beforePayday=dateEnd&&dateEnd>=now?occurrences(schedules,start,dateEnd,done).filter(o=>o.schedule.kind==='bill'&&!o.status):[];
  const doses=today.filter(o=>o.schedule.kind==='medicine').length,appts=today.filter(o=>o.schedule.kind==='appointment').length,todos=today.filter(o=>o.schedule.kind==='todo').length;
  const soon=items.filter(o=>o.schedule.kind==='bill'&&o.at>=now).reduce((n,o)=>n+(o.schedule.amount_pence||0),0);
- const when=(d:Date)=>d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})+(d.getHours()||d.getMinutes()?', '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'');
- const paydayLong=savedPayday?new Date(savedPayday+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'}):'';
+ // Bills due at midnight show the date only; doses and appointments always show their time.
+ const when=(o:Occurrence)=>{const d=o.at;return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})+(o.schedule.kind!=='bill'||d.getHours()||d.getMinutes()?', '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'')};
+ // Paydays can be set up to a year ahead, so show the year when it is not this year.
+ const dayLabel=(ymdValue:string,weekday:'long'|'short')=>{const d=new Date(ymdValue+'T12:00:00');return d.toLocaleDateString('en-GB',{weekday,day:'numeric',month:'long',...(d.getFullYear()!==now.getFullYear()?{year:'numeric' as const}:{})})};
+ const paydayLong=savedPayday?dayLabel(savedPayday,'long'):'';
  return <View style={{gap:14}}>
   <View style={a.card}>
    <Text style={a.heading}>Today at a glance</Text>
@@ -40,19 +43,19 @@ export function AttentionPanel({userId,schedules,done,now,onComplete,busy}:{user
   {attention.slice(0,all?attention.length:3).map((o,i)=>{const missed=isMissed(o,now);const verb=o.schedule.kind==='bill'?'Mark paid':o.schedule.kind==='medicine'?'Mark taken':'Mark done';return <FadeIn key={o.key} delay={Math.min(i,6)*55}><View style={[a.item,missed&&a.missed]}>
    {missed&&<View accessible accessibilityLabel={o.schedule.kind==='bill'?'Missed payment':'Missed dose'} style={a.tagRow}><PulseOnce id={o.key} style={a.dot}/><Text style={a.tag}>{o.schedule.kind==='bill'?'Missed · not marked paid':'Missed dose · not marked taken'}</Text></View>}
    <View style={a.itemTop}>
-    <View style={{flex:1,gap:3}}><Text style={a.itemTitle}>{o.schedule.priority?'★ ':''}{o.schedule.title}</Text><Text style={a.small}>{when(o.at)}{o.schedule.for_person?' · For '+o.schedule.for_person:''}</Text></View>
+    <View style={{flex:1,gap:3}}><Text style={a.itemTitle}>{o.schedule.priority?'★ ':''}{o.schedule.title}</Text><Text style={a.small}>{when(o)}{o.schedule.for_person?' · For '+o.schedule.for_person:''}</Text></View>
     {o.schedule.kind==='bill'&&<Text style={a.amount}>{pounds(o.schedule.amount_pence||0)}</Text>}
     <Pressable accessibilityRole="button" accessibilityLabel={'Dismiss '+o.schedule.title+' from your attention list'} hitSlop={6} disabled={!ready||saving} style={a.dismiss} onPress={()=>void persist([...dismissed,o.key],savedPayday).then(ok=>{if(ok)setUndo(o.key)})}><Feather name="x" size={18} color="#718078"/></Pressable>
    </View>
-   <PressableScale accessibilityRole="button" disabled={busy} style={[a.action,busy&&{opacity:.45}]} onPress={()=>void onComplete(o,o.schedule.kind==='bill'?'paid':o.schedule.kind==='medicine'?'taken':'completed')}><Text style={a.actionText}>{verb}</Text></PressableScale>
+   <PressableScale accessibilityRole="button" accessibilityLabel={verb+': '+o.schedule.title} disabled={busy} style={[a.action,busy&&{opacity:.45}]} onPress={()=>void onComplete(o,o.schedule.kind==='bill'?'paid':o.schedule.kind==='medicine'?'taken':'completed')}><Text style={a.actionText}>{verb}</Text></PressableScale>
   </View></FadeIn>})}
   {attention.length>3&&<Pressable accessibilityRole="button" onPress={()=>setAll(!all)} style={a.linkRow}><Text style={a.link}>{all?'Show fewer':'View all '+attention.length}</Text></Pressable>}
-  {!attention.length&&<View style={a.calm}><Text style={a.itemTitle}>You’re all caught up</Text><Text style={a.small}>Nothing needs your attention right now.</Text></View>}
-  {undo&&<View style={a.undo}><Text style={{color:'white',flex:1}}>Card dismissed</Text><Pressable accessibilityRole="button" disabled={saving} hitSlop={8} onPress={()=>void persist(dismissed.filter(k=>k!==undo),savedPayday).then(ok=>{if(ok)setUndo(null)})}><Text style={{color:'#E9B44C',fontWeight:'700'}}>Undo</Text></Pressable></View>}
+  {!attention.length&&<View style={a.calm}><Text style={a.itemTitle}>{items.some(o=>dismissed.includes(o.key))?'Nothing else needs your attention':'You’re all caught up'}</Text><Text style={a.small}>{items.some(o=>dismissed.includes(o.key))?'Cards you dismissed are hidden here, but their reminders still work.':'Nothing needs your attention right now.'}</Text></View>}
+  {undo&&<View style={a.undo}><Text style={{color:'white',flex:1}}>Card dismissed</Text><Pressable accessibilityRole="button" disabled={saving} style={{minHeight:44,minWidth:44,justifyContent:'center',alignItems:'flex-end'}} onPress={()=>void persist(dismissed.filter(k=>k!==undo),savedPayday).then(ok=>{if(ok)setUndo(null)})}><Text style={{color:'#E9B44C',fontWeight:'700'}}>Undo</Text></Pressable></View>}
   <Text style={a.small}>Dismissing a card does not complete it or turn off its reminders.</Text>
   <View style={a.payday}>
    <Text style={a.heading}>Money needed before payday</Text>
-   <Pressable accessibilityRole="button" accessibilityLabel="Choose your next payday" disabled={!ready||saving} onPress={()=>setPicking(!picking)} style={a.picker}><Text style={{color:'#193D31',flex:1}}>{payday?'Payday · '+new Date(payday+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'}):'Choose your next payday'}</Text><Text style={a.link}>{picking?'Done':saving?'Saving…':'Change'}</Text></Pressable>
+   <Pressable accessibilityRole="button" accessibilityLabel="Choose your next payday" disabled={!ready||saving} onPress={()=>setPicking(!picking)} style={a.picker}><Text style={{color:'#193D31',flex:1}}>{payday?'Payday · '+dayLabel(payday,'short'):'Choose your next payday'}</Text><Text style={a.link}>{picking?'Done':saving?'Saving…':'Change'}</Text></Pressable>
    {picking&&<DateTimePicker value={payday?new Date(payday+'T12:00:00'):todayStart} mode="date" display={Platform.OS==='ios'?'inline':'calendar'} minimumDate={todayStart} maximumDate={new Date(+todayStart+366*86400000)} accentColor="#2D6554" onChange={(event,selected)=>{if(Platform.OS==='android')setPicking(false);if(event.type==='dismissed'||!selected)return;pickPayday(selected)}}/>}
    {dateEnd&&dateEnd>=now?<><CountUp id="payday" style={a.bigNumber} value={beforePayday.reduce((n,o)=>n+(o.schedule.amount_pence||0),0)} format={pounds}/><Text style={a.small}>Unpaid bills you have entered, from the start of this month up to and including {paydayLong}. Based on your bills, not your bank balance. Bills missed before this month are not included.</Text></>:<Text style={a.body}>Set your next payday to see how much to keep aside.</Text>}
   </View>
