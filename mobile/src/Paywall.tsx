@@ -13,14 +13,15 @@ import {FadeIn,PressableScale} from './motion';
 export function Paywall({billing,email,busy,onSignOut,onDeleted}:{billing:ReturnType<typeof useBilling>;email:string;busy:boolean;onSignOut:()=>void;onDeleted:()=>void}){
  const subscribedBefore=!!billing.info?.entitlements.all.premium;
  // Only promise a free month when the store actually offers one to this person (same rule as BillingPanel).
- const trial=!subscribedBefore&&billing.plans.some(plan=>!!freeTrialLabel(plan as PurchasesPackage,billing.eligible[plan.product.identifier]));
+ const trialLabel=subscribedBefore?null:billing.plans.map(plan=>freeTrialLabel(plan as PurchasesPackage,billing.eligible[plan.product.identifier])).find(Boolean)||null;
+ const trial=!!trialLabel,month=trialLabel==='1 month free';
  return <ScrollView contentContainerStyle={p.content}>
   <FadeIn style={{gap:18}}>
    <View style={p.brand}><Image source={require('../assets/logo-mark.png')} style={{width:36,height:35}} accessibilityIgnoresInvertColors/><Text style={p.logo}>DayStead.</Text></View>
-   <Text style={p.hero} accessibilityRole="header">{subscribedBefore?'Welcome back':trial?'Start your free month':'Choose your plan'}</Text>
-   <Text style={p.body}>{subscribedBefore?'Renew your subscription to keep using DayStead. Your bills, medicines and appointments are saved and come straight back.':trial?'Bills, medicine reminders and appointments in one calm app. Try everything free for a month; you pay nothing today and can cancel any time in your app store.':'Bills, medicine reminders and appointments in one calm app. Choose monthly or yearly; you can cancel any time in your app store.'}</Text>
+   <Text style={p.hero} accessibilityRole="header">{subscribedBefore?'Welcome back':trial?(month?'Start your free month':'Start your free trial'):'Choose your plan'}</Text>
+   <Text style={p.body}>{subscribedBefore?'Renew your subscription to keep using DayStead. Your bills, medicines and appointments are saved and come straight back.':trial?'Bills, medicine reminders and appointments in one calm app. Try everything free'+(month?' for a month':' ('+trialLabel+')')+'; you pay nothing today and can cancel any time in your app store.':'Bills, medicine reminders and appointments in one calm app. Choose monthly or yearly; you can cancel any time in your app store.'}</Text>
    {!subscribedBefore&&<View style={p.points}>
-    {['Money needed before payday, worked out for you','Medicine reminders at the times you set','Private reminders: your lock screen only says "DayStead reminder"',...(trial?['We remind you 3 days before your free month ends']:[])].map(point=><View key={point} style={p.point}><View style={p.tick}><Text style={{color:'white',fontWeight:'700',fontSize:13}}>✓</Text></View><Text style={[p.body,{flex:1}]}>{point}</Text></View>)}
+    {['Money needed before payday, worked out for you','Medicine reminders at the times you set','Private reminders: your lock screen only says "DayStead reminder"',...(trial?['We remind you 3 days before your free '+(month?'month':'trial')+' ends']:[])].map(point=><View key={point} style={p.point}><View style={p.tick}><Text style={{color:'white',fontWeight:'700',fontSize:13}}>✓</Text></View><Text style={[p.body,{flex:1}]}>{point}</Text></View>)}
    </View>}
    <BillingPanel billing={billing}/>
    <AccountTools email={email} onDeleted={onDeleted}/>

@@ -37,7 +37,7 @@ function Field({label,...props}:React.ComponentProps<typeof TextInput>&{label:st
 const fail=(error:unknown)=>{
  // 42501: the server refused a change because no active subscription is recorded yet (for example in the
  // first minutes after starting the free month, before the store confirms it to our server).
- if((error as {code?:string})?.code==='42501'){Alert.alert('Almost ready','Your subscription is still being confirmed. Please try again in a minute.');return}
+ if((error as {code?:string})?.code==='42501'){Alert.alert('Subscription not confirmed yet','If you have just subscribed, please try again in a minute. Otherwise, open Account to start or renew your subscription.');return}
  Alert.alert('Please try again',error instanceof Error?error.message:String((error as any)?.message||error));
 };
 
