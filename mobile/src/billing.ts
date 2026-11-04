@@ -11,6 +11,8 @@ export async function connectBilling(userId:string){
  return Purchases.getOfferings();
 }
 export const getBillingInfo=()=>Purchases.getCustomerInfo();
+// Fetch fresh status when the app returns, so a renewal made in the store shows straight away.
+export const invalidateBillingCache=()=>Purchases.invalidateCustomerInfoCache().catch(()=>{});
 export const hasPremium=(info:CustomerInfo|null)=>Boolean(info?.entitlements.active[premiumId]);
 const KNOWN_UNITS=['DAY','WEEK','MONTH','YEAR'];
 const unitName=(unit:string,count:number)=>{const name=unit.toLowerCase().replace(/s$/,'');return `${count} ${name}${count===1?'':'s'}`;};

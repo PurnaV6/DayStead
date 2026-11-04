@@ -34,7 +34,12 @@ const ADD_KINDS:[Schedule['kind'],string,React.ComponentProps<typeof Feather>['n
 const NAV_TABS:[string,React.ComponentProps<typeof Feather>['name']][]=[['Today','sun'],['Dashboard','pie-chart'],['Bills','file-text'],['Medicines','plus-square'],['Planner','calendar'],['Account','user']];
 function Button({title,onPress,secondary=false,disabled=false}:{title:string;onPress:()=>void;secondary?:boolean;disabled?:boolean}){return <PressableScale accessibilityRole="button" accessibilityState={{disabled}} disabled={disabled} onPress={onPress} style={[s.button,secondary&&s.secondary,disabled&&{opacity:.45}]}><Text style={{color:secondary?C.ink:'white',fontWeight:'600',fontSize:15}}>{title}</Text></PressableScale>}
 function Field({label,...props}:React.ComponentProps<typeof TextInput>&{label:string}){return <View style={{gap:6}}><Text style={s.label}>{label}</Text><TextInput placeholderTextColor="#98A098" style={s.input} {...props}/></View>}
-const fail=(error:unknown)=>Alert.alert('Please try again',error instanceof Error?error.message:String((error as any)?.message||error));
+const fail=(error:unknown)=>{
+ // 42501: the server refused a change because no active subscription is recorded yet (for example in the
+ // first minutes after starting the free month, before the store confirms it to our server).
+ if((error as {code?:string})?.code==='42501'){Alert.alert('Almost ready','Your subscription is still being confirmed. Please try again in a minute.');return}
+ Alert.alert('Please try again',error instanceof Error?error.message:String((error as any)?.message||error));
+};
 
 export default function App(){const fontReady=useBrandFont();if(!fontReady)return null;return <SafeAreaProvider><Daystead/></SafeAreaProvider>}
 function Daystead(){
@@ -48,7 +53,9 @@ function Daystead(){
  const [setupOpen,setSetupOpen]=useState(false),[loadedFor,setLoadedFor]=useState<string|null>(null),[prefsKey,setPrefsKey]=useState(0),[setupKnown,setSetupKnown]=useState<string[]>([]);
  const setupChecked=useRef<string|null>(null);
  const billing=useBilling(session?.user.id);
- const premiumAccess=!billingConfigured||billing.active;
+ // While the store is still being checked or cannot be reached, access counts as allowed, so reminders
+ // are kept and saves work; the server rule (supabase/require-subscription.sql) is the backstop.
+ const premiumAccess=!billingConfigured||billing.active||billing.loading||!!billing.error;
  // Billing live and the store says there is no free month or subscription: show the paywall instead of
  // the app. While the store is still being checked, or cannot be reached, nobody is locked out.
  const needsSubscription=billingConfigured&&!billing.loading&&!billing.error&&!billing.active;

@@ -1,5 +1,7 @@
 import React from 'react';
 import {Image,ScrollView,StyleSheet,View} from 'react-native';
+import type {PurchasesPackage} from 'react-native-purchases';
+import {freeTrialLabel} from './billing';
 import {Text} from './Text';
 import {BillingPanel,useBilling} from './BillingPanel';
 import {AccountTools} from './AccountTools';
@@ -10,13 +12,15 @@ import {FadeIn,PressableScale} from './motion';
 // export their data, delete their account or sign out.
 export function Paywall({billing,email,busy,onSignOut,onDeleted}:{billing:ReturnType<typeof useBilling>;email:string;busy:boolean;onSignOut:()=>void;onDeleted:()=>void}){
  const subscribedBefore=!!billing.info?.entitlements.all.premium;
+ // Only promise a free month when the store actually offers one to this person (same rule as BillingPanel).
+ const trial=!subscribedBefore&&billing.plans.some(plan=>!!freeTrialLabel(plan as PurchasesPackage,billing.eligible[plan.product.identifier]));
  return <ScrollView contentContainerStyle={p.content}>
   <FadeIn style={{gap:18}}>
    <View style={p.brand}><Image source={require('../assets/logo-mark.png')} style={{width:36,height:35}} accessibilityIgnoresInvertColors/><Text style={p.logo}>DayStead.</Text></View>
-   <Text style={p.hero} accessibilityRole="header">{subscribedBefore?'Welcome back':'Start your free month'}</Text>
-   <Text style={p.body}>{subscribedBefore?'Renew your subscription to keep using DayStead. Your bills, medicines and appointments are saved and come straight back.':'Bills, medicine reminders and appointments in one calm app. Try everything free for a month; you pay nothing today and can cancel any time in Google Play.'}</Text>
+   <Text style={p.hero} accessibilityRole="header">{subscribedBefore?'Welcome back':trial?'Start your free month':'Choose your plan'}</Text>
+   <Text style={p.body}>{subscribedBefore?'Renew your subscription to keep using DayStead. Your bills, medicines and appointments are saved and come straight back.':trial?'Bills, medicine reminders and appointments in one calm app. Try everything free for a month; you pay nothing today and can cancel any time in your app store.':'Bills, medicine reminders and appointments in one calm app. Choose monthly or yearly; you can cancel any time in your app store.'}</Text>
    {!subscribedBefore&&<View style={p.points}>
-    {['Money needed before payday, worked out for you','Medicine reminders at the times you were prescribed','Private reminders: your lock screen only says "DayStead reminder"','We remind you 3 days before your free month ends'].map(point=><View key={point} style={p.point}><View style={p.tick}><Text style={{color:'white',fontWeight:'700',fontSize:13}}>✓</Text></View><Text style={[p.body,{flex:1}]}>{point}</Text></View>)}
+    {['Money needed before payday, worked out for you','Medicine reminders at the times you set','Private reminders: your lock screen only says "DayStead reminder"',...(trial?['We remind you 3 days before your free month ends']:[])].map(point=><View key={point} style={p.point}><View style={p.tick}><Text style={{color:'white',fontWeight:'700',fontSize:13}}>✓</Text></View><Text style={[p.body,{flex:1}]}>{point}</Text></View>)}
    </View>}
    <BillingPanel billing={billing}/>
    <AccountTools email={email} onDeleted={onDeleted}/>

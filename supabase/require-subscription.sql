@@ -3,6 +3,10 @@
 -- RUN THIS ONLY AT LAUNCH, AFTER:
 --   1. the RevenueCat webhook (supabase/functions/revenuecat-webhook) is deployed and connected, and
 --   2. a test purchase has created a row in public.daystead_subscriptions with status 'trialing' or 'active'.
+--      Play test purchases are sandbox: set REVENUECAT_ALLOW_SANDBOX=true on the webhook for this test ONLY,
+--      then unset it and confirm the row goes back to 'expired'. Never leave sandbox on in production.
+--   3. the subscription sync function from the backlog exists, so a new subscriber is not refused for the
+--      first minutes while the store confirms the purchase (until then the app shows "Almost ready").
 -- Running it earlier blocks everyone from adding records, because no subscription rows exist yet.
 --
 -- What it does:
@@ -20,10 +24,16 @@ returns boolean language sql stable security definer set search_path='' as $$
   select 1 from public.daystead_subscriptions s
   where s.user_id = (select auth.uid())
     and s.status in ('trialing','active','grace')
-    and s.access_until > now()
+    -- A 3-day margin covers the store's renewal message arriving late, so paying users are not
+    -- blocked around each renewal. The app's own store check is what users see day to day.
+    and s.access_until + interval '3 days' > now()
  );
 $$;
 revoke all on function public.daystead_has_access() from public, anon;
+
+-- Subscription rows are written only by the server (the RevenueCat webhook, as service_role).
+-- Make sure no signed-in user can write their own row to get past this check.
+revoke insert, update, delete on public.daystead_subscriptions from anon, authenticated;
 grant execute on function public.daystead_has_access() to authenticated;
 
 drop policy if exists daystead_schedules_insert_needs_access on public.daystead_schedules;
