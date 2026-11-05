@@ -8,7 +8,7 @@ The CEO keeps this list in priority order. The automation cycle (see `AUTOMATION
 - [ ] Finish the device tests in `release/device-tests.md`: tests 6 and 8 on Android, then all 8 on an iPhone. [blocked: owner]
 - [ ] **Android first, about £35:** buy `daystead.app` (Vercel, auto-renew on), Google Play developer account ($25), free support email (for example Zoho), RevenueCat project (free). [blocked: owner]
 - [ ] **Before launch (free):** run the survey, recruit 12 Google Play testers from it, and reserve @daystead on Instagram and TikTok. [blocked: owner]
-- [ ] **At launch:** run `supabase/require-subscription.sql` in the Supabase SQL editor only after the steps at the top of that file: webhook live, a test purchase recorded (sandbox switched on for the test only, then off again), and the subscription sync function deployed. [blocked: owner]
+- [ ] **At launch:** run `supabase/require-subscription.sql` in the Supabase SQL editor only after the steps at the top of that file: webhook live, a test purchase recorded (sandbox switched on for the test only, then off again), and the subscription sync function deployed. Before submitting for review, run `supabase/review-access.sql` for the reviewers' test account (checklist item `storeReviewAccountAccessGranted`). [blocked: owner]
 - [ ] **Later:** Apple Developer ($99/year) once Android has its first paying users; UK trademark for DayStead (class 9, £170) before any marketing spend. [blocked: owner]
 
 ## Next up (agents)

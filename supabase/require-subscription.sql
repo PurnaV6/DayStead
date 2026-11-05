@@ -8,6 +8,7 @@
 --      tap Restore purchases in Account to trigger a sync, and confirm the row goes back to 'expired'. Never leave sandbox on in production.
 --   3. supabase/functions/sync-subscription is deployed as sync-daystead-subscription, so a new subscriber
 --      is not refused for the first minutes while the store confirms the purchase.
+-- Before submitting for store review, also run supabase/review-access.sql for the reviewers' test account.
 -- Running it earlier blocks everyone from adding records, because no subscription rows exist yet.
 --
 -- What it does:
