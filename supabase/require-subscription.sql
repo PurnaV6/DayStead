@@ -3,8 +3,9 @@
 -- RUN THIS ONLY AT LAUNCH, AFTER:
 --   1. the RevenueCat webhook (supabase/functions/revenuecat-webhook) is deployed and connected, and
 --   2. a test purchase has created a row in public.daystead_subscriptions with status 'trialing' or 'active'.
---      Play test purchases are sandbox: set REVENUECAT_ALLOW_SANDBOX=true on the webhook for this test ONLY,
---      then unset it and confirm the row goes back to 'expired'. Never leave sandbox on in production.
+--      Play test purchases are sandbox: set REVENUECAT_ALLOW_SANDBOX=true for this test ONLY (it is a project
+--      secret, so it affects both the webhook and sync-daystead-subscription), then unset it, wait 20 seconds,
+--      tap Restore purchases in Account to trigger a sync, and confirm the row goes back to 'expired'. Never leave sandbox on in production.
 --   3. supabase/functions/sync-subscription is deployed as sync-daystead-subscription, so a new subscriber
 --      is not refused for the first minutes while the store confirms the purchase.
 -- Running it earlier blocks everyone from adding records, because no subscription rows exist yet.

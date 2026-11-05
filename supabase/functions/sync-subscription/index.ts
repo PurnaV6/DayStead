@@ -4,8 +4,11 @@
 import {subscriptionState} from '../_shared/subscription.ts';
 const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, apikey, content-type, x-client-info','Access-Control-Allow-Methods':'POST, OPTIONS'};
 const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{...cors,'Content-Type':'application/json'}});
-// One RevenueCat lookup per account every 20 seconds is plenty, and protects the shared API limit.
-const MIN_GAP_MS=20_000;
+// Limits RevenueCat lookups per account to protect the shared API limit. Accounts without access get a
+// shorter gap, so someone who subscribes just after being refused is not kept waiting.
+const GAP_WITH_ACCESS_MS=20_000,GAP_WITHOUT_ACCESS_MS=5_000,MARGIN_MS=3*86_400_000;
+// Same rule as public.daystead_has_access() in require-subscription.sql.
+const grantsAccess=(status:string,until:string)=>['trialing','active','grace'].includes(status)&&Date.parse(until)+MARGIN_MS>Date.now();
 Deno.serve(async(req:Request)=>{
  if(req.method==='OPTIONS')return new Response(null,{headers:cors});
  if(req.method!=='POST')return json({error:'Method not allowed'},405);
@@ -21,7 +24,10 @@ Deno.serve(async(req:Request)=>{
   const current=await fetch(url+'/rest/v1/daystead_subscriptions?select=status,access_until,updated_at&user_id=eq.'+encodeURIComponent(user.id),{headers:admin});
   if(!current.ok)return json({error:'Billing status lookup failed'},502);
   const [row]=await current.json() as {status:string;access_until:string;updated_at:string}[];
-  if(row&&Date.now()-Date.parse(row.updated_at)<MIN_GAP_MS)return json({status:row.status,access_until:row.access_until});
+  if(row){
+   const access=grantsAccess(row.status,row.access_until);
+   if(Date.now()-Date.parse(row.updated_at)<(access?GAP_WITH_ACCESS_MS:GAP_WITHOUT_ACCESS_MS))return json({status:access?row.status:'expired',access_until:row.access_until});
+  }
   const observedAt=new Date().toISOString();
   const response=await fetch('https://api.revenuecat.com/v1/subscribers/'+encodeURIComponent(user.id),{headers:{Authorization:'Bearer '+apiKey}});
   if(!response.ok)return json({error:'Billing lookup failed'},502);
