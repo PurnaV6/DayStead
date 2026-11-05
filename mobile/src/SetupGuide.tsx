@@ -33,7 +33,7 @@ export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onT
  const paydayLabel=payday?new Date(payday+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'}):'';
  return <View style={g.overlay} accessibilityViewIsModal>
   <View style={g.top}>
-   <Text style={g.eyebrow}>STEP {step+1} OF {STEPS}</Text>
+   <Text style={g.eyebrow}>Step {step+1} of {STEPS}</Text>
    <Pressable accessibilityRole="button" accessibilityLabel="Skip setup" onPress={onClose} style={g.skipAll}><Text style={g.link}>Skip setup</Text></Pressable>
   </View>
   <View style={g.bars} accessible accessibilityLabel={`Step ${step+1} of ${STEPS}`}>{Array.from({length:STEPS},(_,i)=><View key={i} style={[g.bar,i<=step&&{backgroundColor:C.green}]}/>)}</View>
@@ -74,7 +74,7 @@ function Primary({title,onPress,disabled=false}:{title:string;onPress:()=>void;d
 const g=StyleSheet.create({
  overlay:{flex:1,backgroundColor:C.paper,paddingTop:12},
  top:{flexDirection:'row',alignItems:'center',justifyContent:'space-between',paddingHorizontal:22},
- eyebrow:{fontSize:12,letterSpacing:1.5,color:C.muted,fontWeight:'600'},
+ eyebrow:{fontSize:13,color:C.muted,fontWeight:'600'},
  skipAll:{minHeight:44,minWidth:44,justifyContent:'center',paddingHorizontal:4},
  bars:{flexDirection:'row',gap:6,paddingHorizontal:22,marginTop:4},
  bar:{flex:1,height:4,borderRadius:2,backgroundColor:C.line},
@@ -88,7 +88,7 @@ const g=StyleSheet.create({
  chip:{minHeight:44,justifyContent:'center',paddingHorizontal:16,borderRadius:22,backgroundColor:'white',borderWidth:1,borderColor:C.line},
  doneBox:{backgroundColor:C.soft,borderRadius:18,padding:16,gap:6},
  doneText:{fontSize:16,fontWeight:'600',color:C.green},
- primary:{minHeight:50,borderRadius:14,backgroundColor:C.green,alignItems:'center',justifyContent:'center',paddingHorizontal:16},
+ primary:{minHeight:50,borderRadius:25,backgroundColor:C.green,alignItems:'center',justifyContent:'center',paddingHorizontal:16},
  footer:{flexDirection:'row',justifyContent:'space-between',alignItems:'center'},
  textButton:{minHeight:44,minWidth:44,justifyContent:'center'},
 });
