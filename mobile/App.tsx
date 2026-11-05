@@ -17,6 +17,7 @@ import {BillCharts,BillDonut,BillTrend} from './src/Charts';
 import {BillingPanel,useBilling} from './src/BillingPanel';
 import {billingConfigured} from './src/billing';
 import {syncSubscription} from './src/subscriptionSync';
+import {askForReviewIfDue,noteAppUse} from './src/reviewPrompt';
 import {AccountTools} from './src/AccountTools';
 import {SetupGuide} from './src/SetupGuide';
 import {Paywall} from './src/Paywall';
@@ -69,7 +70,7 @@ function Daystead(){
  const total=current.reduce((n,o)=>n+(o.schedule.amount_pence||0),0),remaining=current.filter(o=>o.status!=='paid').reduce((n,o)=>n+(o.schedule.amount_pence||0),0);
  const upcoming=occurrences(schedules,new Date(now.getFullYear(),now.getMonth(),now.getDate()),new Date(+now+35*86400000),done);
  async function load(userId:string,animate=false){
-  const request=++loadRef.current;
+  const request=++loadRef.current;void noteAppUse();
   const [a,b]=await Promise.all([supabase.from('daystead_schedules').select('*').eq('user_id',userId).order('due_at'),supabase.from('daystead_completions').select('*').eq('user_id',userId).gte('occurrence_at',completionsSince(new Date()).toISOString()).order('occurrence_at',{ascending:false})]);
   if(userRef.current!==userId||request!==loadRef.current)return;
   if(a.error||b.error){setLoadFailed(true);throw a.error||b.error}
@@ -91,7 +92,7 @@ function Daystead(){
  if(authMode==='signup'&&(result.error?.code==='user_already_exists'||String(result.error?.message||'').toLowerCase().includes('already registered')||(!result.error&&!result.data.session))){setPassword('');setAuthMode('login');Alert.alert('Check your email','If this is a new account, confirm your email and then sign in. If you already have a DayStead account, sign in or reset your password instead.');return}
  if(result.error)throw result.error;setPassword('');}catch(e){fail(e)}finally{setBusy(false)}}
  async function refresh(){if(!session)return;setBusy(true);try{await load(session.user.id)}catch(e){fail(e)}finally{setBusy(false)}}
- async function complete(o:Occurrence,status:string){if(!session)return;setBusy(true);try{const {error}=await supabase.from('daystead_completions').upsert({user_id:session.user.id,schedule_id:o.schedule.id,occurrence_at:o.at.toISOString(),status});if(error)throw error;await stopAlarm(o.key);if(status!=='skipped')haptic.success();markJustDone(o.key);await load(session.user.id,true)}catch(e){fail(e)}finally{setBusy(false)}}
+ async function complete(o:Occurrence,status:string){if(!session)return;setBusy(true);try{const {error}=await supabase.from('daystead_completions').upsert({user_id:session.user.id,schedule_id:o.schedule.id,occurrence_at:o.at.toISOString(),status});if(error)throw error;await stopAlarm(o.key);if(status!=='skipped')haptic.success();markJustDone(o.key);await load(session.user.id,true);if(status!=='skipped'&&!setupOpen&&!isMissed(o,new Date()))void askForReviewIfDue()}catch(e){fail(e)}finally{setBusy(false)}}
  async function remove(item:Schedule){if(!session)return;setBusy(true);try{const {data,error}=await supabase.from('daystead_schedules').delete().eq('id',item.id).eq('version',item.version).select('id');if(error)throw error;if(!data?.length)throw new Error('This schedule changed on another device. Refresh and try again.');await load(session.user.id)}catch(e){fail(e)}finally{setBusy(false)}}
  async function save(values:Partial<Schedule>){if(!session)return;if(!premiumAccess){setEditor(null);setSetupOpen(false);setTab('Account');Alert.alert('Subscription required','Your records remain available. Open Account to restore or manage your subscription.');return;}setBusy(true);try{const payload={...values,user_id:session.user.id,version:(editor?.version||0)+1};let result=editor?.id?await supabase.from('daystead_schedules').update(payload).eq('id',editor.id).eq('version',editor.version!).select('id'):await supabase.from('daystead_schedules').insert(payload).select('id');if(result.error)throw result.error;if(!result.data?.length)throw new Error('This schedule changed on another device. Refresh before editing.');haptic.success();setEditor(null);await load(session.user.id)}catch(e){if(String((e as {message?:string})?.message).includes('for_person'))Alert.alert('Not available yet','"Who is this for?" needs a quick database update. Choose "Me" for now, or ask the app owner to run supabase/for-person.sql.');else fail(e)}finally{setBusy(false)}}
  async function signOut(){setBusy(true);try{await reconcileReminders([],false);const {error}=await supabase.auth.signOut();if(error)throw error}catch(e){fail(e)}finally{setBusy(false)}}
