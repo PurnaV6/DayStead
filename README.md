@@ -8,7 +8,7 @@ New here? Read [HANDOFF.md](HANDOFF.md) first.
 |---|---|
 | `mobile/` | The iOS/Android app (Expo + Supabase). This is what ships to the stores. See `mobile/README.md`. |
 | `web/` | The showcase website with download buttons, plus privacy, terms, support and account deletion pages, deployed automatically from `main` to Vercel: https://web-mwdx.vercel.app. |
-| `supabase/` | Edge functions (account deletion, owner metrics, RevenueCat webhook) and SQL changes for the live database. |
+| `supabase/` | Edge functions (account deletion, owner metrics, RevenueCat webhook, subscription sync) and SQL changes for the live database. |
 | `release/` | Launch status, blockers and store setup ([release/LAUNCH.md](release/LAUNCH.md)). |
 | `research/` | Market research. |
 

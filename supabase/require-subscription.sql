@@ -5,8 +5,8 @@
 --   2. a test purchase has created a row in public.daystead_subscriptions with status 'trialing' or 'active'.
 --      Play test purchases are sandbox: set REVENUECAT_ALLOW_SANDBOX=true on the webhook for this test ONLY,
 --      then unset it and confirm the row goes back to 'expired'. Never leave sandbox on in production.
---   3. the subscription sync function from the backlog exists, so a new subscriber is not refused for the
---      first minutes while the store confirms the purchase (until then the app shows "Almost ready").
+--   3. supabase/functions/sync-subscription is deployed as sync-daystead-subscription, so a new subscriber
+--      is not refused for the first minutes while the store confirms the purchase.
 -- Running it earlier blocks everyone from adding records, because no subscription rows exist yet.
 --
 -- What it does:
