@@ -3,6 +3,7 @@ import {AppState,Linking,Pressable,View} from 'react-native';
 import {Text} from './Text';
 import type {CustomerInfo,PurchasesPackage} from 'react-native-purchases';
 import {billingConfigured,connectBilling,invalidateBillingCache,freeTrialLabel,iosTrialEligibility,priceForEntitlement,getBillingInfo,hasPremium,premiumId,purchasePlan,restorePurchases,watchBilling} from './billing';
+import {syncSubscription} from './subscriptionSync';
 import {setTrialWarning} from './notifications';
 export function useBilling(userId?:string){
  const [state,setState]=useState<{userId?:string;info:CustomerInfo|null;plans:PurchasesPackage[];eligible:Record<string,boolean>;error:string;loading:boolean}>({info:null,plans:[],eligible:{},error:'',loading:false});
@@ -54,7 +55,7 @@ export function BillingPanel({billing}: {billing:ReturnType<typeof useBilling>})
  const trialPrice=priceForEntitlement(billing.plans,entitlement?.productIdentifier);
  const shown=billingConfigured?billing.plans:previewPlans;
  const annualSaving=savingLabel(shown.find(p=>p.packageType==='MONTHLY')?.product,shown.find(p=>p.packageType==='ANNUAL')?.product);
- const run=async(restore=false)=>{setBusy(true);setMessage('');try{const info=restore?await restorePurchases():(await purchasePlan(plan!)).customerInfo;billing.setInfo(info);setMessage(hasPremium(info)?'Premium access is active.':'No active subscription was found. If a purchase is pending, access will update after the store confirms it.')}catch(e){if(!(e as {userCancelled?:boolean}).userCancelled)setMessage(e instanceof Error?e.message:'The store could not complete this request.')}finally{setBusy(false)}};
+ const run=async(restore=false)=>{setBusy(true);setMessage('');try{const info=restore?await restorePurchases():(await purchasePlan(plan!)).customerInfo;billing.setInfo(info);if(hasPremium(info))void syncSubscription();setMessage(hasPremium(info)?'Premium access is active.':'No active subscription was found. If a purchase is pending, access will update after the store confirms it.')}catch(e){if(!(e as {userCancelled?:boolean}).userCancelled)setMessage(e instanceof Error?e.message:'The store could not complete this request.')}finally{setBusy(false)}};
  const button=(label:string,action:()=>void,disabled=false)=><Pressable accessibilityRole="button" disabled={disabled} onPress={action} style={{padding:16,borderRadius:14,backgroundColor:disabled?'#DCE2D9':'#2D6554',alignItems:'center'}}><Text style={{color:disabled?'#56635B':'white',fontWeight:'600'}}>{label}</Text></Pressable>;
  return <View style={{backgroundColor:'white',padding:20,borderRadius:22,gap:16}}>
   <Text style={{fontSize:22,fontWeight:'600',color:'#193D31'}}>DayStead Premium</Text>

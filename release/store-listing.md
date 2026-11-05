@@ -102,7 +102,7 @@ Captions can be added on top of the screenshots later by the designer; plain scr
 
 **Ads:** No, the app does not contain ads.
 
-**App access:** Login required. Provide a test account for Google's reviewers (email and password of a test DayStead account with sample data, and a note: "Sign in with these details. Subscription is not needed during review" until billing is live; once live, give a test account with an active subscription or note that the free month can be started with a test card).
+**App access:** Login required. Provide a test account for Google's reviewers (email and password of a test DayStead account with sample data, and a note: "Sign in with these details. Subscription is not needed during review" until billing is live; once billing is live, give the review account set up with `supabase/review-access.sql`, because test purchases never count as paid on our server).
 
 **Target audience and content:** 18 and over only (money and medicines; keeps the app out of the Families policy). Not designed for children.
 

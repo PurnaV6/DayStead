@@ -16,6 +16,7 @@ import {ReminderHealth} from './src/ReminderHealth';
 import {BillCharts,BillDonut,BillTrend} from './src/Charts';
 import {BillingPanel,useBilling} from './src/BillingPanel';
 import {billingConfigured} from './src/billing';
+import {syncSubscription} from './src/subscriptionSync';
 import {AccountTools} from './src/AccountTools';
 import {SetupGuide} from './src/SetupGuide';
 import {Paywall} from './src/Paywall';
@@ -37,7 +38,8 @@ function Field({label,...props}:React.ComponentProps<typeof TextInput>&{label:st
 const fail=(error:unknown)=>{
  // 42501: the server refused a change because no active subscription is recorded yet (for example in the
  // first minutes after starting the free month, before the store confirms it to our server).
- if((error as {code?:string})?.code==='42501'){Alert.alert('Subscription not confirmed yet','If you have just subscribed, please try again in a minute. Otherwise, open Account to start or renew your subscription.');return}
+ // Ask the server to check the store straight away; if access is now confirmed, the user just tries again.
+ if((error as {code?:string})?.code==='42501'){void syncSubscription().then(ok=>ok?Alert.alert('Subscription confirmed','Thanks for waiting. Please try that again.'):Alert.alert('Subscription not confirmed yet','If you have just subscribed, please try again in a minute. Otherwise, open Account to start or renew your subscription.'));return}
  Alert.alert('Please try again',error instanceof Error?error.message:String((error as any)?.message||error));
 };
 

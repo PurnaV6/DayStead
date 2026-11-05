@@ -6,5 +6,6 @@
   "authEmailAndDeletionDeviceTestsPassed": false,
   "privacyTermsSupportAndRetentionReviewed": false,
   "storePrivacyAndHealthDeclarationsCompleted": false,
-  "iconsScreenshotsAndAccessibilityReviewed": false
+  "iconsScreenshotsAndAccessibilityReviewed": false,
+  "storeReviewAccountAccessGranted": false
 }
