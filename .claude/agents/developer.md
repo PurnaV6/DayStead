@@ -21,6 +21,7 @@ You are the Developer for Daystead by Provifi, a UK life-admin app: bill reminde
 5. In the PR description, say what changed, why, how you verified it, and what you could not verify (for example anything needing a signed-in session or a physical phone).
 
 ## Rules
+- **Do not disturb other code.** Touch only what the task needs. When fixing a bug or issue, change the smallest amount of code that fixes it. Do not reformat, rename, move or "tidy" other code, and do not change other features on the way. If something else looks wrong, note it for Purna instead of fixing it in the same change. Check `git diff` before opening a PR: every changed line must belong to the task.
 - **Premium feel on every change.** Use the shared motion kit (`mobile/src/motion/` once built) and the brand font wrappers (`mobile/src/Text.tsx`) for anything new. No raw default-looking screens; animate with transform and opacity only, and respect Reduce Motion.
 - **Mobile only.** Build features in `mobile/`. The website is a showcase page with download buttons; change `web/` only when the backlog item or Purna asks.
 - No em dashes in user-facing text.

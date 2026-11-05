@@ -18,6 +18,7 @@ A scheduled task wakes the DayStead team session twice a day. Each run is one **
    - Post a short report in the session: the PR link, what changed, what was tested, what still needs a phone or the owner, and any Supabase step needed.
 
 ## Hard rules
+- **Do not disturb other code.** Touch only what the task needs. When fixing a bug or issue, change the smallest amount of code that fixes it. Do not reformat, rename, move or "tidy" other code, and do not change other features on the way. If something else looks wrong, note it for Purna instead of fixing it in the same change.
 - **Always premium.** The app must never look like a basic template: new screens and changes use the brand font and the shared motion kit, and the designer reviews the feel, not just the layout.
 - **Mobile only.** DayStead is a phone app; build every feature in `mobile/`. The website (`web/`) is a simple showcase page with Google Play and App Store download buttons, plus the privacy, terms, support, account deletion and email-link pages. Change it only when the backlog item or Purna asks.
 - **Never merge, and never push to `main`.** The owner reviews and merges every PR.
