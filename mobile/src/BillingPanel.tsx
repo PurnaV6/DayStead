@@ -2,7 +2,7 @@ import React,{useEffect,useState} from 'react';
 import {AppState,Linking,Pressable,View} from 'react-native';
 import {Text} from './Text';
 import type {CustomerInfo,PurchasesPackage} from 'react-native-purchases';
-import {billingConfigured,connectBilling,freeTrialLabel,iosTrialEligibility,priceForEntitlement,getBillingInfo,hasPremium,premiumId,purchasePlan,restorePurchases,watchBilling} from './billing';
+import {billingConfigured,connectBilling,invalidateBillingCache,freeTrialLabel,iosTrialEligibility,priceForEntitlement,getBillingInfo,hasPremium,premiumId,purchasePlan,restorePurchases,watchBilling} from './billing';
 import {setTrialWarning} from './notifications';
 export function useBilling(userId?:string){
  const [state,setState]=useState<{userId?:string;info:CustomerInfo|null;plans:PurchasesPackage[];eligible:Record<string,boolean>;error:string;loading:boolean}>({info:null,plans:[],eligible:{},error:'',loading:false});
@@ -10,7 +10,7 @@ export function useBilling(userId?:string){
   if(!userId||!billingConfigured)return;
   let active=true,stop:undefined|(()=>void),refreshing=false;
   const refresh=async()=>{if(refreshing)return;refreshing=true;try{
-   const offers=await connectBilling(userId);const next=await getBillingInfo();
+   const offers=await connectBilling(userId);await invalidateBillingCache();const next=await getBillingInfo();
    const plans=offers.current?.availablePackages.filter(p=>p.packageType==='MONTHLY'||p.packageType==='ANNUAL')||[];
    // If Apple can't answer, show no trial rather than risk promising one the store won't give.
    const eligible=await iosTrialEligibility(plans).catch(()=>({}));
