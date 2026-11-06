@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps,attentionStart,completionsSince} from '../src/domain.ts';
 import type {Schedule} from '../src/domain.ts';
+import {healthRows,restartState} from '../src/reminderHealthRules.ts';
 const base:Schedule={id:'bill1',user_id:'u1',kind:'bill',title:'Rent',category:'Rent',amount_pence:95000,due_at:new Date(2026,0,31,9).toISOString(),repeat_rule:'monthly',end_at:null,notes:'',version:1};
 test('month end recurrence clamps February and returns to March 31',()=>{
  const items=occurrences([base],new Date(2026,1,1),new Date(2026,3,1));
@@ -113,4 +114,23 @@ test('attention looks back 35 days, so last month\'s unpaid bill stays after the
 test('completions are loaded from the earlier of last month\'s 1st and 35 days ago',()=>{
  const a=completionsSince(new Date(2026,10,1,9));assert.deepEqual([a.getMonth(),a.getDate()],[8,27]);
  const b=completionsSince(new Date(2026,10,30,9));assert.deepEqual([b.getMonth(),b.getDate()],[9,1]);
+});
+test('reminder check: failed rows get the right settings button, iPhone hides Android-only rows',()=>{
+ const base={android:true,notifications:false,alarm:'permission-required' as const,batteryRestricted:true,testReceived:false,restart:'failed' as const};
+ const rows=healthRows(base);
+ assert.deepEqual(rows.map(r=>[r.key,r.state,r.action?.kind]),[['notifications','fail','notifications'],['alarms','fail','alarms'],['battery','fail','battery'],['test','fail','test'],['restart','fail','restart']]);
+ const good=healthRows({android:true,notifications:true,alarm:'authorized',batteryRestricted:false,testReceived:true,restart:'passed'});
+ assert.ok(good.every(r=>r.state==='pass'&&!r.action));
+ const ios=healthRows({...base,android:false});
+ assert.deepEqual(ios.map(r=>r.key),['notifications','test','restart']);
+ const unknown=healthRows({android:true,notifications:null,alarm:'development-build-required',batteryRestricted:null,testReceived:null,restart:'not-started'});
+ assert.ok(unknown.every(r=>r.state==='unknown'));
+ assert.equal(unknown.find(r=>r.key==='battery')?.action?.kind,'battery');
+ assert.equal(unknown.find(r=>r.key==='alarms')?.action,undefined);
+});
+test('restart check waits for the test time, then asks once, then keeps the answer',()=>{
+ assert.equal(restartState(null,1000),'not-started');
+ assert.equal(restartState({dueAt:5000},1000),'waiting');
+ assert.equal(restartState({dueAt:5000},5000),'ask');
+ assert.equal(restartState({dueAt:5000,result:'passed'},9000),'passed');
 });

@@ -9,6 +9,7 @@
     "@react-native-community/datetimepicker": "9.2.1",
     "@supabase/supabase-js": "2.118.0",
     "expo": "58.0.21",
+    "expo-battery": "~58.0.3",
     "expo-dev-client": "58.0.17",
     "expo-font": "~58.0.11",
     "expo-haptics": "~58.0.7",
