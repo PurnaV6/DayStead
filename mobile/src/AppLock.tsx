@@ -18,21 +18,29 @@ async function verify(message:string){const a=await auth();if(!a)return false;tr
 
 export function useAppLock(signedIn:boolean){
  const [enabled,setEnabled]=useState<boolean|null>(null),[locked,setLocked]=useState(true);
- const backgroundAt=useRef<number|null>(null),enabledRef=useRef(false);
+ const backgroundAt=useRef<number|null>(null),enabledRef=useRef(false),verifying=useRef(false);
  useEffect(()=>{let active=true;AsyncStorage.getItem(KEY).then(v=>{if(!active)return;const on=v==='on';enabledRef.current=on;setEnabled(on);if(!on)setLocked(false)}).catch(()=>{if(active){setEnabled(false);setLocked(false)}});return()=>{active=false}},[]);
  useEffect(()=>{
   const sub=AppState.addEventListener('change',state=>{
+   // The phone's own PIN screen can briefly send DayStead to the background; that must not relock it.
+   if(verifying.current)return;
    if(state==='background')backgroundAt.current=Date.now();
    else if(state==='active'){if(shouldRelock(enabledRef.current,backgroundAt.current,Date.now()))setLocked(true);backgroundAt.current=null}
   });
   return()=>sub.remove();
  },[]);
- const unlock=useCallback(async()=>{if(await verify('Unlock DayStead')){haptic.success();setLocked(false)}},[]);
+ const check=useCallback(async(message:string)=>{verifying.current=true;try{return await verify(message)}finally{verifying.current=false;backgroundAt.current=null}},[]);
+ const unlock=useCallback(async()=>{
+  // If the phone no longer has a screen lock, the check can never pass. Removing a phone's lock already needs
+  // its PIN, so let the user in and turn app lock off rather than shut them out of their own records.
+  if(!(await canUseAppLock())){await AsyncStorage.setItem(KEY,'off').catch(()=>{});enabledRef.current=false;setEnabled(false);setLocked(false);return}
+  if(await check('Unlock DayStead')){haptic.success();setLocked(false)}
+ },[check]);
  const setOn=useCallback(async(on:boolean)=>{
   // Confirm with the phone's own check before turning it on or off, so someone else cannot change it.
-  if(!(await verify(on?'Turn on app lock':'Turn off app lock')))return false;
+  if(!(await check(on?'Turn on app lock':'Turn off app lock')))return false;
   await AsyncStorage.setItem(KEY,on?'on':'off');enabledRef.current=on;setEnabled(on);return true;
- },[]);
+ },[check]);
  return {enabled:!!enabled,ready:enabled!==null,locked:signedIn&&(enabled===null||(enabled&&locked)),unlock,setOn};
 }
 
@@ -61,7 +69,7 @@ export function AppLockSetting({enabled,onChange}:{enabled:boolean;onChange:(on:
   <Text style={l.heading}>App lock</Text>
   <Text style={l.cardBody}>{enabled?'On. DayStead asks for your fingerprint, face or phone PIN when it opens, and after 1 minute away.':'Ask for your fingerprint, face or phone PIN when DayStead opens. Useful on a shared phone.'}</Text>
   {available===false&&!enabled?<Text style={l.small}>Set up a screen lock in your phone settings first. If you have one, this needs the latest version of DayStead.</Text>
-   :<PressableScale accessibilityRole="switch" accessibilityState={{checked:enabled,disabled:busy||!available}} accessibilityLabel="App lock" disabled={busy||available===null} onPress={()=>void toggle()} style={[l.secondary,busy&&{opacity:.45}]}><Text style={{color:C.ink,fontWeight:'600',fontSize:15}}>{busy?'Please wait…':enabled?'Turn off app lock':'Turn on app lock'}</Text></PressableScale>}
+   :<PressableScale accessibilityRole="button" accessibilityState={{disabled:busy||available===null}} disabled={busy||available===null} onPress={()=>void toggle()} style={[l.secondary,busy&&{opacity:.45}]}><Text style={{color:C.ink,fontWeight:'600',fontSize:15}}>{busy?'Please wait…':enabled?'Turn off app lock':'Turn on app lock'}</Text></PressableScale>}
   {!!note&&<Text style={[l.small,{color:C.red}]} accessibilityLiveRegion="polite">{note}</Text>}
   <Text style={l.small}>Stays on this phone only. Nothing is sent anywhere.</Text>
  </View>;
