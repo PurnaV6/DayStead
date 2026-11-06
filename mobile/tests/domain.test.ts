@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps,attentionStart,completionsSince} from '../src/domain.ts';
+import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps,attentionStart,completionsSince,shouldRelock} from '../src/domain.ts';
 import type {Schedule} from '../src/domain.ts';
 const base:Schedule={id:'bill1',user_id:'u1',kind:'bill',title:'Rent',category:'Rent',amount_pence:95000,due_at:new Date(2026,0,31,9).toISOString(),repeat_rule:'monthly',end_at:null,notes:'',version:1};
 test('month end recurrence clamps February and returns to March 31',()=>{
@@ -113,4 +113,10 @@ test('attention looks back 35 days, so last month\'s unpaid bill stays after the
 test('completions are loaded from the earlier of last month\'s 1st and 35 days ago',()=>{
  const a=completionsSince(new Date(2026,10,1,9));assert.deepEqual([a.getMonth(),a.getDate()],[8,27]);
  const b=completionsSince(new Date(2026,10,30,9));assert.deepEqual([b.getMonth(),b.getDate()],[9,1]);
+});
+test('app lock relocks only when on and after a minute in the background',()=>{
+ assert.equal(shouldRelock(true,1000,1000+59999),false);
+ assert.equal(shouldRelock(true,1000,1000+60000),true);
+ assert.equal(shouldRelock(false,1000,1000+600000),false);
+ assert.equal(shouldRelock(true,null,999999),false);
 });

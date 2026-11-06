@@ -86,3 +86,7 @@ export function completionsSince(now:Date){
 export function missedFollowUps(items:Occurrence[], now:Date){
  return items.filter(o=>!o.status&&(o.schedule.kind==='bill'||o.schedule.kind==='medicine')).map(o=>({occurrence:o,at:o.schedule.kind==='bill'?new Date(o.at.getFullYear(),o.at.getMonth(),o.at.getDate()+1,9):new Date(+o.at+MISSED_DOSE_MINUTES*60000)})).filter(f=>f.at>now).sort((a,b)=>+a.at-+b.at);
 }
+
+// Optional app lock: locks when DayStead opens, and again after this long in the background.
+export const LOCK_AFTER_MS=60000;
+export const shouldRelock=(enabled:boolean,backgroundAt:number|null,now:number)=>enabled&&backgroundAt!==null&&now-backgroundAt>=LOCK_AFTER_MS;

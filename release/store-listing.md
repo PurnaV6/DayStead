@@ -137,6 +137,7 @@ Before submitting, check RevenueCat's current Google Play data safety guidance i
 | Foreground service, media playback | Plays the alarm sound until the user stops it | **Declaration required**: describe "Plays the user's medicine alarm sound until they stop it" and attach a short screen recording of an alarm ringing and being stopped. See the CTO note below. |
 | Run at start-up (`RECEIVE_BOOT_COMPLETED`) | Restores alarms after the phone restarts | None |
 | Vibrate | Alarm vibration | None |
+| Biometric (`USE_BIOMETRIC`) | Optional app lock, off by default: fingerprint, face or phone PIN to open DayStead | None. Data safety: nothing to add, because the check happens on the phone and no fingerprint, face or PIN data is collected, stored or sent by DayStead |
 
 ---
 
