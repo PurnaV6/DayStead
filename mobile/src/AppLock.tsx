@@ -29,7 +29,7 @@ export function useAppLock(signedIn:boolean){
   });
   return()=>sub.remove();
  },[]);
- const check=useCallback(async(message:string)=>{verifying.current=true;try{return await verify(message)}finally{verifying.current=false;backgroundAt.current=null}},[]);
+ const check=useCallback(async(message:string)=>{verifying.current=true;try{return await verify(message)}finally{verifying.current=false;backgroundAt.current=AppState.currentState==='active'?null:Date.now()}},[]);
  const unlock=useCallback(async()=>{
   // If the phone no longer has a screen lock, the check can never pass. Removing a phone's lock already needs
   // its PIN, so let the user in and turn app lock off rather than shut them out of their own records.
