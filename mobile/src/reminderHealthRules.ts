@@ -25,7 +25,7 @@ export function healthRows(i:HealthInput):HealthRow[]{
    :i.alarm===null?{key:'alarms',state:'unknown',title:'Alarm-style reminders',detail:'Not checked yet.'}
    :{key:'alarms',state:'unknown',title:'Alarm-style reminders',detail:'Available in the full DayStead app from Google Play.'});
   rows.push(i.batteryRestricted===false?{key:'battery',state:'pass',title:'Battery saving is not limiting DayStead',detail:'Reminders are not held back to save battery.'}
-   :i.batteryRestricted===true?{key:'battery',state:'fail',title:'Battery saving may delay reminders',detail:'Set DayStead\'s battery use to "Unrestricted" or "Not optimised".',action:{kind:'battery',label:'Open battery settings'}}
+   :i.batteryRestricted===true?{key:'battery',state:'fail',title:'Battery saving may delay reminders',detail:'Choose "All apps", find DayStead, and set it to "Unrestricted" or "Don\'t optimise".',action:{kind:'battery',label:'Open battery settings'}}
    :{key:'battery',state:'unknown',title:'Battery saving',detail:'Could not check on this phone. You can check it yourself in battery settings.',action:{kind:'battery',label:'Open battery settings'}});
  }
  rows.push(i.testSending?{key:'test',state:'unknown',title:'Test reminder',detail:'Sent. It should arrive in a few seconds.'}
@@ -37,7 +37,7 @@ export function healthRows(i:HealthInput):HealthRow[]{
   waiting:{key:'restart',state:'unknown',title:'After a restart',detail:'Restart your phone now. A test reminder should arrive about 3 minutes after you started. Then open DayStead again.'},
   ask:{key:'restart',state:'unknown',title:'After a restart',detail:'Did the test reminder arrive after the restart?'},
   passed:{key:'restart',state:'pass',title:'Reminders arrive after a restart',detail:'Checked on this phone.'},
-  failed:{key:'restart',state:'fail',title:'Reminder did not arrive after a restart',detail:'Open DayStead once after each restart, and check battery saving above.',action:{kind:'restart',label:'Try again'}},
+  failed:{key:'restart',state:'fail',title:'Reminder did not arrive after a restart',detail:'Check battery saving above, then try again.',action:{kind:'restart',label:'Try again'}},
  };
  rows.push(restart[i.restart]);
  return rows;

@@ -7,11 +7,12 @@ import {Text} from './Text';
 import {FadeIn,PressableScale,haptic} from './motion';
 import {alarmStatus,requestAlarmPermission,type AlarmStatus} from './alarm';
 import {healthRows,restartState,type HealthAction,type HealthRow,type RestartCheck} from './reminderHealthRules';
+import {RESTART_BODY,RESTART_ID,RESTART_KEY,scheduleCheckReminder} from './notifications';
 
 // Plain pass/fail reminder check. Each failed row has a button to the right phone setting.
 // Wording never promises reminders always arrive: phones can still delay them.
 const C={ink:'#193D31',muted:'#5E6E66',green:'#2D6554',soft:'#EDF2E9',red:'#B3261E',redSoft:'#FDF0EE',line:'#E4E8DF',amber:'#8A5A00',amberSoft:'#FFF4DC'};
-const TEST_ID='daystead:test',RESTART_ID='daystead:restart-test',RESTART_KEY='daystead.restartCheck',RESTART_MINUTES=3;
+const TEST_ID='daystead:test',RESTART_MINUTES=3;
 const android=Platform.OS==='android';
 
 // Loaded only when needed, so a development build made before expo-battery was added still starts.
@@ -20,11 +21,11 @@ async function batteryRestricted():Promise<boolean|null>{
  try{const Battery=await import('expo-battery');return await Battery.isBatteryOptimizationEnabledAsync()}catch{return null}
 }
 async function readRestart(){try{const v=await AsyncStorage.getItem(RESTART_KEY);return v?JSON.parse(v) as {dueAt:number;result?:'passed'|'failed'}:null}catch{return null}}
-const content=(body:string)=>({title:'DayStead reminder',body,sound:'default' as const});
 
 export function ReminderHealth(){
  const [notifications,setNotifications]=useState<boolean|null>(null),[alarm,setAlarm]=useState<AlarmStatus|null>(null),[battery,setBattery]=useState<boolean|null>(null);
  const [testReceived,setTestReceived]=useState<boolean|null>(null),[testSending,setTestSending]=useState(false),[restart,setRestart]=useState<RestartCheck>('not-started');
+ const [problem,setProblem]=useState('');
  const testTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const check=useCallback(async()=>{
   try{setNotifications((await Notifications.getPermissionsAsync()).granted)}catch{setNotifications(null)}
@@ -35,22 +36,29 @@ export function ReminderHealth(){
  useEffect(()=>{
   const first=setTimeout(()=>void check(),0);
   const sub=AppState.addEventListener('change',s=>{if(s==='active')void check()});
-  const got=Notifications.addNotificationReceivedListener(n=>{if(n.request.identifier===TEST_ID){if(testTimer.current)clearTimeout(testTimer.current);setTestSending(false);setTestReceived(true);haptic.success()}});
-  return()=>{clearTimeout(first);sub.remove();got.remove();if(testTimer.current)clearTimeout(testTimer.current)};
+  // Counts as arrived whether it shows while DayStead is open or the user taps it from the tray.
+  const arrived=(id:string)=>{if(id===TEST_ID){if(testTimer.current)clearTimeout(testTimer.current);setTestSending(false);setTestReceived(true);haptic.success()}};
+  const got=Notifications.addNotificationReceivedListener(n=>arrived(n.request.identifier));
+  const tapped=Notifications.addNotificationResponseReceivedListener(r=>arrived(r.notification.request.identifier));
+  return()=>{clearTimeout(first);sub.remove();got.remove();tapped.remove();if(testTimer.current)clearTimeout(testTimer.current)};
  },[check]);
 
  async function sendTest(){
-  if(!(await Notifications.getPermissionsAsync()).granted){setNotifications(false);return}
-  setTestReceived(null);setTestSending(true);
-  await Notifications.scheduleNotificationAsync({identifier:TEST_ID,content:content('Test: your reminder arrived.'),trigger:{type:Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,seconds:5,channelId:'daystead'}});
+  if(!(await Notifications.getPermissionsAsync()).granted){setNotifications(false);setProblem('Allow notifications first, then send the test.');return}
+  setTestReceived(null);setTestSending(true);setProblem('');
+  if(testTimer.current)clearTimeout(testTimer.current);
+  await scheduleCheckReminder(TEST_ID,Date.now()+5000,'Test: your reminder arrived.');
   // If the app was in the background the listener may miss it, so also look in the notification tray.
   testTimer.current=setTimeout(()=>{void Notifications.getPresentedNotificationsAsync().then(list=>list.some(n=>n.request.identifier===TEST_ID)).catch(()=>false).then(found=>{setTestSending(false);setTestReceived(t=>t||found)})},20000);
  }
  async function startRestart(){
-  if(!(await Notifications.getPermissionsAsync()).granted){setNotifications(false);return}
+  if(!(await Notifications.getPermissionsAsync()).granted){setNotifications(false);setProblem('Allow notifications first, then start the restart check.');return}
+  setProblem('');
   const dueAt=Date.now()+RESTART_MINUTES*60000;
-  await Notifications.scheduleNotificationAsync({identifier:RESTART_ID,content:content('Restart check: this reminder arrived. Open DayStead to finish.'),trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:new Date(dueAt),channelId:'daystead'}});
-  await AsyncStorage.setItem(RESTART_KEY,JSON.stringify({dueAt}));setRestart('waiting');
+  await AsyncStorage.setItem(RESTART_KEY,JSON.stringify({dueAt}));
+  await scheduleCheckReminder(RESTART_ID,dueAt,RESTART_BODY);setRestart('waiting');
+  // Moves on to the question by itself if the user stays on this screen.
+  setTimeout(()=>setRestart(r=>r==='waiting'?'ask':r),RESTART_MINUTES*60000+2000);
  }
  async function answerRestart(result:'passed'|'failed'){
   const stored=await readRestart();await AsyncStorage.setItem(RESTART_KEY,JSON.stringify({dueAt:stored?.dueAt||Date.now(),result}));
@@ -64,13 +72,14 @@ export function ReminderHealth(){
    else if(kind==='battery'){try{await Linking.sendIntent('android.settings.IGNORE_BATTERY_OPTIMIZATION_SETTINGS')}catch{await Linking.openSettings()}}
    else if(kind==='test')await sendTest();
    else await startRestart();
-  }catch{setTestSending(false)}
+  }catch{setTestSending(false);setProblem('That did not work. Please try again.')}
  }
 
  const rows=healthRows({android,notifications,alarm,batteryRestricted:battery,testReceived,testSending,restart});
  const failed=rows.filter(r=>r.state==='fail').length,allPass=rows.every(r=>r.state==='pass');
  return <View style={h.card}>
   <Text style={h.title} accessibilityRole="header">Reminder check</Text>
+  {!!problem&&<Text style={h.problem} accessibilityLiveRegion="assertive">{problem}</Text>}
   <Text style={h.summary} accessibilityLiveRegion="polite">{allPass?'Everything looks good on this phone.':failed?`${failed} ${failed===1?'thing needs':'things need'} your attention.`:'A few quick checks on this phone.'}</Text>
   <View style={{gap:10}}>{rows.map(r=><Row key={r.key} row={r} onAct={kind=>void act(kind)} onAnswer={r.key==='restart'&&restart==='ask'?a=>void answerRestart(a):undefined}/>)}</View>
   <Text style={h.note}>Phones can still delay reminders, for example in Do Not Disturb or battery saver.</Text>
@@ -82,15 +91,15 @@ function Row({row,onAct,onAnswer}:{row:HealthRow;onAct:(k:HealthAction)=>void;on
  return <FadeIn trigger={row.state}><View style={[h.row,{backgroundColor:tone.bg}]} accessible={!row.action&&!onAnswer} accessibilityLabel={`${tone.label}: ${row.title}. ${row.detail}`}>
   <Feather name={tone.icon} size={22} color={tone.color} style={{marginTop:1}}/>
   <View style={{flex:1,gap:4}}>
-   <Text style={h.rowTitle}>{row.title}</Text>
+   <Text style={h.rowTitle} accessibilityLabel={`${tone.label}: ${row.title}`}>{row.title}</Text>
    <Text style={h.rowDetail}>{row.detail}</Text>
-   {onAnswer?<View style={h.answers}><Small label="Yes, it arrived" onPress={()=>onAnswer('passed')} primary/><Small label="No" onPress={()=>onAnswer('failed')}/></View>
-    :row.action&&<View style={h.answers}><Small label={row.action.label} hint={row.title} onPress={()=>onAct(row.action!.kind)} primary={row.state==='fail'}/></View>}
+   {onAnswer?<View style={h.answers}><Small label="Yes, it arrived" onPress={()=>onAnswer('passed')} primary/><Small label="No" a11y="No, it did not arrive" onPress={()=>onAnswer('failed')}/></View>
+    :row.action&&<View style={h.answers}><Small label={row.action.label} onPress={()=>onAct(row.action!.kind)} primary={row.state==='fail'}/></View>}
   </View>
  </View></FadeIn>;
 }
-function Small({label,onPress,primary=false,hint}:{label:string;onPress:()=>void;primary?:boolean;hint?:string}){
- return <PressableScale accessibilityRole="button" accessibilityHint={hint} onPress={onPress} style={[h.small,primary&&{backgroundColor:C.green,borderColor:C.green}]}><Text style={{color:primary?'white':C.ink,fontWeight:'600',fontSize:14}}>{label}</Text></PressableScale>;
+function Small({label,onPress,primary=false,a11y}:{label:string;onPress:()=>void;primary?:boolean;a11y?:string}){
+ return <PressableScale accessibilityRole="button" accessibilityLabel={a11y||label} onPress={onPress} style={[h.small,primary&&{backgroundColor:C.green,borderColor:C.green}]}><Text style={{color:primary?'white':C.ink,fontWeight:'600',fontSize:14}}>{label}</Text></PressableScale>;
 }
 
 const h=StyleSheet.create({
@@ -102,5 +111,6 @@ const h=StyleSheet.create({
  rowDetail:{fontSize:13,lineHeight:19,color:C.muted},
  answers:{flexDirection:'row',gap:8,flexWrap:'wrap',marginTop:6},
  small:{minHeight:44,borderRadius:22,paddingHorizontal:16,justifyContent:'center',backgroundColor:'white',borderWidth:1,borderColor:C.line},
+ problem:{fontSize:14,lineHeight:20,color:C.red,fontWeight:'600'},
  note:{fontSize:12,lineHeight:18,color:C.muted},
 });

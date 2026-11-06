@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import {alarmStatus,replaceAlarms} from './alarm';
 import {Platform} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Occurrence, plannedAlerts, nativeAlarmCandidates, missedFollowUps} from './domain';
 
 Notifications.setNotificationHandler({handleNotification:async()=>({shouldShowBanner:true,shouldShowList:true,shouldPlaySound:true,shouldSetBadge:false})});
@@ -30,11 +31,29 @@ export function setTrialWarning(next:{endsAt:Date;price:string}|null){
  const run=async()=>{await Notifications.cancelScheduledNotificationAsync(TRIAL_ID).catch(()=>{});await scheduleTrialWarning();};
  const result=pending.then(run,run);pending=result.then(()=>{},()=>{});return result;
 }
+// Reminder check notices (a test, and the restart check). Like the trial warning, they are re-added after each
+// reconcile cancels everything, so refreshing the app cannot wipe them. At most 2, keeping iOS under 64 pending.
+const checks=new Map<string,{at:number;body:string}>();
+// The restart check must survive the app being closed and the phone restarting, so it is also saved on the phone.
+export const RESTART_ID='daystead:restart-test',RESTART_KEY='daystead.restartCheck',RESTART_BODY='Restart check: this reminder arrived. Open DayStead to finish.';
+async function scheduleChecks(){
+ try{const v=await AsyncStorage.getItem(RESTART_KEY);const r=v?JSON.parse(v) as {dueAt:number;result?:string}:null;if(r&&!r.result&&!checks.has(RESTART_ID))checks.set(RESTART_ID,{at:r.dueAt,body:RESTART_BODY})}catch{}
+ for(const [id,c] of checks){
+  if(c.at<=Date.now()+1000){checks.delete(id);continue}
+  await Notifications.scheduleNotificationAsync({identifier:id,content:{title:'DayStead reminder',body:c.body,sound:'default'},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:new Date(c.at),channelId:'daystead'}});
+ }
+}
+export function scheduleCheckReminder(id:string,at:number,body:string){
+ checks.set(id,{at,body});
+ const run=async()=>{await Notifications.cancelScheduledNotificationAsync(id).catch(()=>{});await scheduleChecks();};
+ const result=pending.then(run,run);pending=result.then(()=>{},()=>{});return result;
+}
 export function reconcileReminders(items:Occurrence[], enabled:boolean){
  const run=async()=>{
   await Notifications.cancelAllScheduledNotificationsAsync();
   // A billing notice, not a schedule reminder: kept even when schedule reminders are off.
   await scheduleTrialWarning();
+  await scheduleChecks();
   if(!enabled){await replaceAlarms([]);return {count:0,through:null,alarmNote:''};}
   const permission=await Notifications.getPermissionsAsync();
   if(!permission.granted){await replaceAlarms([]);return {count:0,through:null,alarmNote:'Notifications are not allowed.'};}
