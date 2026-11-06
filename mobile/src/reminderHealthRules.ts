@@ -21,7 +21,7 @@ export function healthRows(i:HealthInput):HealthRow[]{
   :{key:'notifications',state:'unknown',title:'Notifications',detail:'Not checked yet.'});
  if(i.android){
   rows.push(i.alarm==='authorized'?{key:'alarms',state:'pass',title:'Alarm-style reminders are allowed',detail:'Medicines set to ring can ring at the exact time.'}
-   :i.alarm==='permission-required'?{key:'alarms',state:'fail',title:'Alarm-style reminders are not allowed',detail:'Needed for medicines set to ring like an alarm.',action:{kind:'alarms',label:'Allow'}}
+   :i.alarm==='permission-required'?{key:'alarms',state:'fail',title:'Alarm-style reminders are not allowed',detail:'Needed for medicines set to ring like an alarm.',action:{kind:'alarms',label:'Allow alarm-style reminders'}}
    :i.alarm===null?{key:'alarms',state:'unknown',title:'Alarm-style reminders',detail:'Not checked yet.'}
    :{key:'alarms',state:'unknown',title:'Alarm-style reminders',detail:'Available in the full DayStead app from Google Play.'});
   rows.push(i.batteryRestricted===false?{key:'battery',state:'pass',title:'Battery saving is not limiting DayStead',detail:'Reminders are not held back to save battery.'}

@@ -43,9 +43,9 @@ async function scheduleChecks(){
   await Notifications.scheduleNotificationAsync({identifier:id,content:{title:'DayStead reminder',body:c.body,sound:'default'},trigger:{type:Notifications.SchedulableTriggerInputTypes.DATE,date:new Date(c.at),channelId:'daystead'}});
  }
 }
-export function scheduleCheckReminder(id:string,at:number,body:string){
- checks.set(id,{at,body});
- const run=async()=>{await Notifications.cancelScheduledNotificationAsync(id).catch(()=>{});await scheduleChecks();};
+// Pass delayMs for the quick test, so its time is set when it is actually scheduled, not while it waits in the queue.
+export function scheduleCheckReminder(id:string,at:number,body:string,delayMs?:number){
+ const run=async()=>{checks.set(id,{at:delayMs?Date.now()+delayMs:at,body});await Notifications.cancelScheduledNotificationAsync(id).catch(()=>{});await scheduleChecks();};
  const result=pending.then(run,run);pending=result.then(()=>{},()=>{});return result;
 }
 export function reconcileReminders(items:Occurrence[], enabled:boolean){

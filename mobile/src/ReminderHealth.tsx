@@ -26,9 +26,9 @@ export function ReminderHealth(){
  const [notifications,setNotifications]=useState<boolean|null>(null),[alarm,setAlarm]=useState<AlarmStatus|null>(null),[battery,setBattery]=useState<boolean|null>(null);
  const [testReceived,setTestReceived]=useState<boolean|null>(null),[testSending,setTestSending]=useState(false),[restart,setRestart]=useState<RestartCheck>('not-started');
  const [problem,setProblem]=useState('');
- const testTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const testTimer=useRef<ReturnType<typeof setTimeout>|null>(null),restartTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const check=useCallback(async()=>{
-  try{setNotifications((await Notifications.getPermissionsAsync()).granted)}catch{setNotifications(null)}
+  try{const granted=(await Notifications.getPermissionsAsync()).granted;setNotifications(granted);if(granted)setProblem('')}catch{setNotifications(null)}
   if(android){try{setAlarm(await alarmStatus())}catch{setAlarm(null)}setBattery(await batteryRestricted())}
   setRestart(restartState(await readRestart(),Date.now()));
  },[]);
@@ -40,14 +40,14 @@ export function ReminderHealth(){
   const arrived=(id:string)=>{if(id===TEST_ID){if(testTimer.current)clearTimeout(testTimer.current);setTestSending(false);setTestReceived(true);haptic.success()}};
   const got=Notifications.addNotificationReceivedListener(n=>arrived(n.request.identifier));
   const tapped=Notifications.addNotificationResponseReceivedListener(r=>arrived(r.notification.request.identifier));
-  return()=>{clearTimeout(first);sub.remove();got.remove();tapped.remove();if(testTimer.current)clearTimeout(testTimer.current)};
+  return()=>{clearTimeout(first);sub.remove();got.remove();tapped.remove(); if(testTimer.current)clearTimeout(testTimer.current);if(restartTimer.current)clearTimeout(restartTimer.current)};
  },[check]);
 
  async function sendTest(){
   if(!(await Notifications.getPermissionsAsync()).granted){setNotifications(false);setProblem('Allow notifications first, then send the test.');return}
   setTestReceived(null);setTestSending(true);setProblem('');
   if(testTimer.current)clearTimeout(testTimer.current);
-  await scheduleCheckReminder(TEST_ID,Date.now()+5000,'Test: your reminder arrived.');
+  await scheduleCheckReminder(TEST_ID,0,'Test: your reminder arrived.',5000);
   // If the app was in the background the listener may miss it, so also look in the notification tray.
   testTimer.current=setTimeout(()=>{void Notifications.getPresentedNotificationsAsync().then(list=>list.some(n=>n.request.identifier===TEST_ID)).catch(()=>false).then(found=>{setTestSending(false);setTestReceived(t=>t||found)})},20000);
  }
@@ -58,7 +58,8 @@ export function ReminderHealth(){
   await AsyncStorage.setItem(RESTART_KEY,JSON.stringify({dueAt}));
   await scheduleCheckReminder(RESTART_ID,dueAt,RESTART_BODY);setRestart('waiting');
   // Moves on to the question by itself if the user stays on this screen.
-  setTimeout(()=>setRestart(r=>r==='waiting'?'ask':r),RESTART_MINUTES*60000+2000);
+  if(restartTimer.current)clearTimeout(restartTimer.current);
+  restartTimer.current=setTimeout(()=>setRestart(r=>r==='waiting'?'ask':r),RESTART_MINUTES*60000+2000);
  }
  async function answerRestart(result:'passed'|'failed'){
   const stored=await readRestart();await AsyncStorage.setItem(RESTART_KEY,JSON.stringify({dueAt:stored?.dueAt||Date.now(),result}));
