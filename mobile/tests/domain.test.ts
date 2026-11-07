@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps,attentionStart,completionsSince} from '../src/domain.ts';
+import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps,attentionStart,completionsSince,shouldAskForReview} from '../src/domain.ts';
 import type {Schedule} from '../src/domain.ts';
 const base:Schedule={id:'bill1',user_id:'u1',kind:'bill',title:'Rent',category:'Rent',amount_pence:95000,due_at:new Date(2026,0,31,9).toISOString(),repeat_rule:'monthly',end_at:null,notes:'',version:1};
 test('month end recurrence clamps February and returns to March 31',()=>{
@@ -113,4 +113,12 @@ test('attention looks back 35 days, so last month\'s unpaid bill stays after the
 test('completions are loaded from the earlier of last month\'s 1st and 35 days ago',()=>{
  const a=completionsSince(new Date(2026,10,1,9));assert.deepEqual([a.getMonth(),a.getDate()],[8,27]);
  const b=completionsSince(new Date(2026,10,30,9));assert.deepEqual([b.getMonth(),b.getDate()],[9,1]);
+});
+test('review prompt waits 7 days from first use and then 120 days between asks',()=>{
+ const day=86400000,first=Date.UTC(2026,0,1);
+ assert.equal(shouldAskForReview(first+6*day,first,null),false);
+ assert.equal(shouldAskForReview(first+7*day,first,null),true);
+ assert.equal(shouldAskForReview(first+7*day,null,null),false);
+ assert.equal(shouldAskForReview(first+100*day,first,first+7*day),false);
+ assert.equal(shouldAskForReview(first+127*day,first,first+7*day),true);
 });
