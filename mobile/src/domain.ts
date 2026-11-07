@@ -95,3 +95,7 @@ export function shouldAskForReview(now:number,firstUseAt:number|null,lastAskedAt
  if(!firstUseAt||now-firstUseAt<REVIEW_AFTER_DAYS*day)return false;
  return !lastAskedAt||now-lastAskedAt>=REVIEW_GAP_DAYS*day;
 }
+
+// Optional app lock: locks when DayStead opens, and again after this long in the background.
+export const LOCK_AFTER_MS=60000;
+export const shouldRelock=(enabled:boolean,backgroundAt:number|null,now:number)=>enabled&&backgroundAt!==null&&now-backgroundAt>=LOCK_AFTER_MS;

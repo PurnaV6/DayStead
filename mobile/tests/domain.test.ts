@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps,attentionStart,completionsSince,shouldAskForReview} from '../src/domain.ts';
+import {occurrences,monthBills,plannedAlerts,todayMedicines,nativeAlarmCandidates,isMissed,missedFollowUps,attentionStart,completionsSince,shouldAskForReview,shouldRelock} from '../src/domain.ts';
 import type {Schedule} from '../src/domain.ts';
 import {healthRows,restartState} from '../src/reminderHealthRules.ts';
 const base:Schedule={id:'bill1',user_id:'u1',kind:'bill',title:'Rent',category:'Rent',amount_pence:95000,due_at:new Date(2026,0,31,9).toISOString(),repeat_rule:'monthly',end_at:null,notes:'',version:1};
@@ -141,4 +141,10 @@ test('review prompt waits 7 days from first use and then 120 days between asks',
  assert.equal(shouldAskForReview(first+7*day,null,null),false);
  assert.equal(shouldAskForReview(first+100*day,first,first+7*day),false);
  assert.equal(shouldAskForReview(first+127*day,first,first+7*day),true);
+});
+test('app lock relocks only when on and after a minute in the background',()=>{
+ assert.equal(shouldRelock(true,1000,1000+59999),false);
+ assert.equal(shouldRelock(true,1000,1000+60000),true);
+ assert.equal(shouldRelock(false,1000,1000+600000),false);
+ assert.equal(shouldRelock(true,null,999999),false);
 });

@@ -13,6 +13,7 @@
     "expo-dev-client": "58.0.17",
     "expo-font": "~58.0.11",
     "expo-haptics": "~58.0.7",
+    "expo-local-authentication": "~58.0.2",
     "expo-notifications": "58.1.7",
     "expo-status-bar": "58.0.4",
     "expo-store-review": "~58.0.2",
