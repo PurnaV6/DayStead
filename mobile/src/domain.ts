@@ -87,6 +87,15 @@ export function missedFollowUps(items:Occurrence[], now:Date){
  return items.filter(o=>!o.status&&(o.schedule.kind==='bill'||o.schedule.kind==='medicine')).map(o=>({occurrence:o,at:o.schedule.kind==='bill'?new Date(o.at.getFullYear(),o.at.getMonth(),o.at.getDate()+1,9):new Date(+o.at+MISSED_DOSE_MINUTES*60000)})).filter(f=>f.at>now).sort((a,b)=>+a.at-+b.at);
 }
 
+// Store review prompt timing: only 7 or more calendar days after DayStead was first opened on this phone, and at most once every 120 days.
+// Google Play and Apple also limit how often their prompt really appears, so asking is never guaranteed to show it.
+export const REVIEW_AFTER_DAYS=7,REVIEW_GAP_DAYS=120;
+export function shouldAskForReview(now:number,firstUseAt:number|null,lastAskedAt:number|null){
+ const day=86400000;
+ if(!firstUseAt||now-firstUseAt<REVIEW_AFTER_DAYS*day)return false;
+ return !lastAskedAt||now-lastAskedAt>=REVIEW_GAP_DAYS*day;
+}
+
 // Optional app lock: locks when DayStead opens, and again after this long in the background.
 export const LOCK_AFTER_MS=60000;
 export const shouldRelock=(enabled:boolean,backgroundAt:number|null,now:number)=>enabled&&backgroundAt!==null&&now-backgroundAt>=LOCK_AFTER_MS;

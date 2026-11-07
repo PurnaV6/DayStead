@@ -2,6 +2,7 @@ import React,{useEffect,useState} from 'react';
 import {Alert,BackHandler,Platform,Pressable,ScrollView,StyleSheet,View} from 'react-native';
 import {Text} from './Text';
 import {PressableScale} from './motion';
+import {ReminderHealth} from './ReminderHealth';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {supabase} from './supabase';
 
@@ -58,7 +59,7 @@ export function SetupGuide({userId,firstBill,remindersOn,templates,onAddBill,onT
     <Text style={g.title} accessibilityRole="header">Turn on reminders</Text>
     <Text style={g.text}>We remind you 3 days before a bill is due, and at each medicine time you set.</Text>
     <Text style={g.text}>Reminders say “DayStead reminder”, so your lock screen never shows what a bill or medicine is.</Text>
-    {remindersOn?<><View style={g.doneBox}><Text style={g.doneText}>✓ Reminders are on for this phone</Text></View><Primary title="Finish" onPress={onClose}/></>:<Primary title={asking?'Please wait…':'Turn on reminders'} disabled={asking} onPress={()=>void reminders()}/>}
+    {remindersOn?<><View style={g.doneBox}><Text style={g.doneText}>✓ Reminders are on for this phone</Text></View><ReminderHealth/><Primary title="Finish" onPress={onClose}/></>:<Primary title={asking?'Please wait…':'Turn on reminders'} disabled={asking} onPress={()=>void reminders()}/>}
    </>}
    <View style={g.footer}>
     {step>0?<Pressable accessibilityRole="button" onPress={()=>setStep(step-1)} style={g.textButton}><Text style={g.link}>Back</Text></Pressable>:<View/>}
